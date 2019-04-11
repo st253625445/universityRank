@@ -58,8 +58,8 @@ deploy_master:
 deploy_dev:
   image: alpine
   stage: deploy
-  only:
-    - "v1.2_20180912"
+#  only:
+#    - "v1.2_20180912"
   tags: 
     - builder
   script:
