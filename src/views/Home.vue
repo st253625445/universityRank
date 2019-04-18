@@ -185,7 +185,7 @@ export default {
   filters: {
     numToFiexd(val) {
       if (val) {
-        return (val - 0).toFixed(1);
+        return (val - 0).toFixed(2);
       }
     },
     weightFilter(val) {
