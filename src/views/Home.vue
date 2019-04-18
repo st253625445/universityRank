@@ -40,22 +40,22 @@
     </div>
     <div class="page-container homeCountBox">
       <div class="rankBox">
-        <p class="title">全球 最好的大学排行</p>
+        <p class="title">可自主调参的全球大学排名</p>
         <p class="directions">
-          包含一些权威发布的大学排行，如“世界大学学术排名（ARWU）”会发布的历年年度最好大学排名榜单、201xTIMES全球大学排名、世界大学排名中心(Center
-          for World University Rankings
-          即CWUR)发布2018-2019世界各大高校排名情况等。包含一些权威发布的大学排行，如“世界大学学术排名(ARWU)”会发布的历年年度最好大学排名榜单、201xTIMES全球大学排名、世界大学排名中心（Center
-          for World University Rankings
-          即CWUR）发布2018-2019世界各大高校排名情况等。
+          2019牛排（最牛大学排名）囊括了世界90多个国家和地区的1900多所大学。牛排根据声誉、学术能力、资金、师资力量、校友影响力这五个因素对大学进行了比较和排名。当前五个参数的权重处于默认调参状态，用户可以根据自身需求进行自主调参。通过排名结果，用户可以分析比较世界高校的综合实力，也可了解高校在特定领域的发展情况，在求学深造等人生重要关键抉择上获取更多可靠的帮助。
         </p>
         <el-row type="flex">
           <div class="silderBox">
             <ul>
               <li v-for="(item, index) in silderFrom" :key="index">
                 <span class="label">{{ item.label }}</span>
+                <span class="weight">{{
+                  params.weight[weightList[index]] | weightFilter
+                }}</span>
                 <el-slider
                   v-model="item.data"
-                  :show-tooltip="false"
+                  :step="5"
+                  :format-tooltip="formatTooltip"
                   :disabled="item.disabled"
                 ></el-slider>
                 <div class="disabledIcon" @click="changeDisabled(index)">
@@ -64,11 +64,17 @@
                 </div>
               </li>
             </ul>
-            <p class="text">
-              提示：当5个因子比例之和等于100%时，按照标准百分百比例计算。当5个因子比例相加不等于100%时，按照对应比例计算。如只选择了声誉20%、学术能力20%，其他因子占比为0时，最终计算则为声誉与学术能力各占50%。
-            </p>
-            <el-button type="primary" @click="onSubmitSlider">确认</el-button>
+            <el-button
+              type="primary"
+              @click="onSubmitSlider"
+              :disabled="!cansubmit"
+              >确认</el-button
+            >
             <el-button @click="resizeSlider">重置</el-button>
+            <p class="text">
+              1、参数说明：默认参数由乌镇智库设定，点击重置将恢复默认。<br />
+              2、权重说明：当5个因子比例之和等于100%时，按照标准百分百比例计算。当5个因子比例相加不等于100%时，按照对应比例计算。如选择了声誉20%、学术能力20%，其他因子占比为0%时，最终因子比例则为声誉与学术能力各占50%。
+            </p>
           </div>
           <div class="rankCunt">
             <el-table :data="rankData" style="width: 100%">
@@ -87,7 +93,7 @@
                   <span class="countryName">{{ scope.row.country_cn }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="总分" width="50">
+              <el-table-column label="总分" width="60">
                 <template slot-scope="scope">
                   <span>{{ scope.row.score | numToFiexd }}</span>
                 </template>
@@ -123,6 +129,7 @@ export default {
     return {
       loading: true,
       countryList: [],
+      cansubmit: true,
       silderFrom: [
         {
           data: 30,
@@ -152,6 +159,13 @@ export default {
       ],
       rankData: [],
       total: 0,
+      weightList: [
+        "Reputation",
+        "Academic Performance",
+        "Endowment",
+        "Faculty",
+        "Alumni"
+      ],
       params: {
         language: "zh",
         weight: {
@@ -171,8 +185,34 @@ export default {
   filters: {
     numToFiexd(val) {
       if (val) {
-        return (val - 0).toFixed(1);
+        return (val - 0).toFixed(2);
       }
+    },
+    weightFilter(val) {
+      return (val * 100).toFixed(1) + "%";
+    }
+  },
+  watch: {
+    silderFrom: {
+      handler(val) {
+        this.cansubmit = false;
+        let _weight = this.weightList;
+        let total = 0;
+        for (let i = 0; i < val.length; i++) {
+          if (!val[i].disabled && val[i].data > 0) {
+            total += val[i].data;
+            this.cansubmit = true;
+          }
+        }
+        for (let i = 0; i < val.length; i++) {
+          if (!val[i].disabled && total !== 0) {
+            this.params.weight[_weight[i]] = val[i].data / total;
+          } else {
+            this.params.weight[_weight[i]] = 0;
+          }
+        }
+      },
+      deep: true
     }
   },
   mounted() {
@@ -181,18 +221,16 @@ export default {
   },
   components: {},
   methods: {
-    onSubmit() {
-      console.log("submit!");
+    formatTooltip(val) {
+      return `${val}%`;
     },
     handleSizeChange(val) {
       this.params.pageSize = val;
       this.getRankList();
-      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       this.params.pageNow = val;
       this.getRankList();
-      console.log(`当前页: ${val}`);
     },
     // 权重禁用切换
     changeDisabled(index) {
@@ -200,27 +238,6 @@ export default {
     },
     // 确认权重滑动
     onSubmitSlider() {
-      let _weight = [
-        "Reputation",
-        "Academic Performance",
-        "Endowment",
-        "Faculty",
-        "Alumni"
-      ];
-      let total = 0;
-      for (let i = 0; i < this.silderFrom.length; i++) {
-        if (!this.silderFrom[i].disabled) {
-          total += this.silderFrom[i].data;
-        }
-      }
-
-      for (let i = 0; i < this.silderFrom.length; i++) {
-        if (!this.silderFrom[i].disabled) {
-          this.params.weight[_weight[i]] = this.silderFrom[i].data / total;
-        } else {
-          this.params.weight[_weight[i]] = 0;
-        }
-      }
       this.params = {
         ...this.params,
         ...{
@@ -270,15 +287,6 @@ export default {
     // 大学名称点击跳转大学详情页
     nameClick(name) {
       console.log(name);
-      // let _query = {
-      //   name: name,
-      //   language: "zh"
-      // };
-      // let routeData = this.$router.resolve({
-      //   path: "/info",
-      //   query: _query
-      // });
-      // window.open(routeData.href, "_blank");
     },
     // 请求国家列表
     getCountryList() {
@@ -412,7 +420,11 @@ export default {
       width: 350px;
       padding-right: 20px;
       padding-bottom: 40px;
+      ul {
+        margin-bottom: 50px;
+      }
       li {
+        position: relative;
         display: flex;
         margin-bottom: 12px;
       }
@@ -423,6 +435,17 @@ export default {
         font-size: 14px;
         color: rgb(0, 0, 0);
         line-height: 38px;
+      }
+      .weight {
+        position: absolute;
+        display: block;
+        width: 72px;
+        text-align: right;
+        font-size: 12px;
+        color: rgb(0, 0, 0);
+        left: 0;
+        top: 25px;
+        line-height: 20px;
       }
       .el-slider {
         flex: 1;
@@ -461,26 +484,27 @@ export default {
         border-color: #cccccc;
       }
       .text {
-        margin: 15px 0 30px;
+        margin: 30px 0 15px;
         font-size: 12px;
         color: rgb(204, 204, 204);
         line-height: 22px;
-        text-align: left;
+        text-align: justify;
       }
       .el-button {
         border-radius: 0;
         padding: 5px 15px;
         font-size: 12px;
-        color: rgb(204, 204, 204);
-        border-color: rgb(204, 204, 204);
-        & + .el-button {
-          margin-left: 80px;
-        }
-      }
-      .el-button--primary {
         color: #fff;
         background-color: #4f63df;
         border-color: #4f63df;
+        & + .el-button {
+          margin-left: 80px;
+        }
+        &.is-disabled {
+          color: rgb(204, 204, 204);
+          background: #fff;
+          border-color: rgb(204, 204, 204);
+        }
       }
     }
     .rankCunt {
