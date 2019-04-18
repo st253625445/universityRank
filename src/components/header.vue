@@ -1,7 +1,7 @@
 <template>
   <header>
     <div class="app-header">
-      <div class="logo">2019乌镇智库世界大学排名</div>
+      <div class="logo">2019牛排New Rank</div>
       <div class="headerNav">
         <ul>
           <li>首页</li>
