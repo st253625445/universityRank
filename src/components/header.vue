@@ -1,13 +1,27 @@
 <template>
   <header>
     <div class="app-header">
-      <div class="logo">2019牛排New Rank</div>
+      <div class="logo">{{ $t("message.title") }}</div>
       <div class="headerNav">
-        <ul>
+        <!-- <ul>
           <li>首页</li>
           <li>全球大学</li>
           <li>学院</li>
-        </ul>
+        </ul> -->
+        <el-select
+          v-model="selectValue"
+          size="mini"
+          @change="langChange"
+          placeholder="请选择"
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option
+        ></el-select>
       </div>
     </div>
     <div class="adcolumn"></div>
@@ -15,7 +29,35 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      selectValue: "",
+      options: [
+        {
+          value: "zh",
+          label: "中文"
+        },
+        {
+          value: "en",
+          label: "English"
+        }
+      ]
+    };
+  },
+  created() {
+    this.selectValue =
+      localStorage.lang == undefined ? "zh" : localStorage.lang;
+  },
+  methods: {
+    //语言切换
+    langChange(e) {
+      // console.log(e)
+      localStorage.setItem("lang", e);
+      this.$i18n.locale = e;
+    }
+  }
+};
 </script>
 
 <style lang="less">
@@ -36,6 +78,7 @@ header {
     line-height: 60px;
   }
   .headerNav {
+    display: flex;
     font-size: 16px;
     color: rgb(255, 255, 255);
     line-height: 50px;
@@ -46,6 +89,13 @@ header {
     li {
       padding: 0 20px;
       cursor: pointer;
+    }
+    .el-select {
+      width: 90px;
+    }
+    .el-input__inner {
+      background: transparent;
+      color: #fff;
     }
   }
   .adcolumn {

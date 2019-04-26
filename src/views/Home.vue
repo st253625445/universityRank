@@ -15,7 +15,7 @@
           <el-select
             v-model="params.country"
             size="mini"
-            placeholder="选择国家"
+            :placeholder="$t('placeholder.country')"
             clearable
           >
             <el-option
@@ -29,29 +29,53 @@
         </div>
         <div class="universitySearchBox">
           <el-input
-            placeholder="请输入学校名称"
+            :placeholder="$t('placeholder.schoolSearch')"
             size="mini"
             v-model="params.name"
           >
-            <el-button slot="append" @click="seachButtonClick">搜索</el-button>
+            <el-button slot="append" @click="seachButtonClick">{{
+              $t("placeholder.searchText")
+            }}</el-button>
           </el-input>
         </div>
       </div>
     </div>
     <div class="page-container homeCountBox">
       <div class="rankBox">
-        <p class="title">可自主调参的全球大学排名</p>
-        <p class="directions">
-          2019牛排（最牛大学排名）囊括了世界90多个国家和地区的1900多所大学。牛排根据声誉、学术能力、资金、师资力量、校友影响力这五个因素对大学进行了比较和排名。当前五个参数的权重处于默认调参状态，用户可以根据自身需求进行自主调参。通过排名结果，用户可以分析比较世界高校的综合实力，也可了解高校在特定领域的发展情况，在求学深造等人生重要关键抉择上获取更多可靠的帮助。
+        <p class="title" v-if="locale === 'zh'">可自主调参的全球大学排名</p>
+        <p class="title" v-else>Up to You Universitiy Rankings</p>
+        <p class="directions" v-if="locale === 'zh'">
+          2019牛排（最牛世界大学排名）为用户提供了可以分析比较世界大学综合实力，及特定领域发展的可靠工具。牛排囊括了世界90多个国家和地区的将近2000所大学。牛排根据声誉、学术能力、资金、师资力量、校友影响力这五个因素对大学进行了比较和排名。当前五个参数的权重处于默认调参状态，用户可以根据自身需求进行自主调参。
+        </p>
+        <p class="directions" v-else>
+          Niupai provides reliable world university rankings for users to
+          understand and compare the comprehensive strength and development in a
+          specific field of universities. Niupai considers nearly 2,000
+          universities from over 90 countries. Universities are ranked by 5
+          indicators, including reputation, academic performance, endowment,
+          strength of faculty, and alumni impact. Currently, weights of the 5
+          indicators are at the default state, and users can adjust them
+          according to personal preferences.
         </p>
         <el-row type="flex">
           <div class="silderBox">
             <ul>
               <li v-for="(item, index) in silderFrom" :key="index">
-                <span class="label">{{ item.label }}</span>
-                <span class="weight">{{
-                  params.weight[weightList[index]] | weightFilter
-                }}</span>
+                <div class="labelBox">
+                  <span
+                    class="label"
+                    v-if="locale === 'zh'"
+                    :title="item.label"
+                  >
+                    {{ item.label }}
+                  </span>
+                  <span class="label" v-else :title="item.enlabel">
+                    {{ item.enlabel }}
+                  </span>
+                  <span class="weight">{{
+                    params.weight[weightList[index]] | weightFilter
+                  }}</span>
+                </div>
                 <el-slider
                   v-model="item.data"
                   :step="5"
@@ -59,7 +83,7 @@
                   :disabled="item.disabled"
                 ></el-slider>
                 <div class="disabledIcon" @click="changeDisabled(index)">
-                  <i class="el-icon-circle-check" v-if="!item.disabled"></i>
+                  <i class="el-icon-success" v-if="!item.disabled"></i>
                   <i class="icon-disabled" v-else></i>
                 </div>
               </li>
@@ -68,32 +92,56 @@
               type="primary"
               @click="onSubmitSlider"
               :disabled="!cansubmit"
-              >确认</el-button
+              >{{ $t("placeholder.ConfirmText") }}</el-button
             >
-            <el-button @click="resizeSlider">重置</el-button>
-            <p class="text">
-              1、参数说明：默认参数由乌镇智库设定，点击重置将恢复默认。<br />
-              2、权重说明：当5个因子比例之和等于100%时，按照标准百分百比例计算。当5个因子比例相加不等于100%时，按照对应比例计算。如选择了声誉20%、学术能力20%，其他因子占比为0%时，最终因子比例则为声誉与学术能力各占50%。
+            <el-button @click="resizeSlider">{{
+              $t("placeholder.resetText")
+            }}</el-button>
+            <p class="text" v-if="locale === 'zh'">
+              调参说明<br />
+              说明1：默认权重由乌镇智库设定，点击重置将恢复默认。<br />
+              说明2：当5个因子比例之和等于100%时，按照标准百分百比例计算。当5个因子比例相加不等于100%时，按照对应比例计算。如只选择了声誉20%、学术能力20%时，其他因子占比为0%时，最终权重则为声誉与学术能力各占50%。
+            </p>
+            <p class="text" v-else>
+              Explanation: <br />
+              1.The default value of each indicator has been set by Niupai.
+              Clicking “Reset” button, then it will back to the default
+              value.<br />
+              2.When the sum of ratios for all indicators equal 100%, each ratio
+              is calculated according to the setting value. When the sum of
+              ratios for all indicators do not equal 100%, each ratio is
+              calculated according to the corresponding value. For example, if
+              you set 20% Reputation and 20% Academic Performance, and set other
+              indicators as 0%, then the final weights are 50% Reputation and
+              50% Academic Performance.
             </p>
           </div>
           <div class="rankCunt">
             <el-table :data="rankData" style="width: 100%">
-              <el-table-column prop="xh" label="序号" width="65">
+              <el-table-column
+                prop="xh"
+                :label="$t('indexPage.tableIndex')"
+                width="65"
+              >
               </el-table-column>
-              <el-table-column label="大学名称">
+              <el-table-column :label="$t('indexPage.universityName')">
                 <template slot-scope="scope">
-                  <p class="name" @click="nameClick(scope.row.cnName)">
-                    {{ scope.row.cnName }}
+                  <p class="name" @click="nameClick(scope.row)">
+                    {{ locale === "zh" ? scope.row.cnName : scope.row.enName }}
                   </p>
                   <img
                     :src="scope.row.image_country"
                     alt=""
                     class="countryImg"
                   />
-                  <span class="countryName">{{ scope.row.country_cn }}</span>
+                  <span class="countryName">{{
+                    locale === "zh"
+                      ? scope.row.country_cn
+                      : scope.row.country_en
+                  }}</span>
                 </template>
               </el-table-column>
-              <el-table-column label="总分" width="60">
+              <el-table-column :label="$t('indexPage.scoreText')" width="60">
                 <template slot-scope="scope">
                   <span>{{ scope.row.score | numToFiexd }}</span>
                 </template>
@@ -120,6 +168,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { getCountryList, getRankList } from "@/API/getData";
 
@@ -134,26 +183,31 @@ export default {
         {
           data: 30,
           label: "声誉",
+          enlabel: "Reputation",
           disabled: false
         },
         {
           data: 25,
           label: "学术能力",
+          enlabel: "Academic Performance",
           disabled: false
         },
         {
           data: 15,
           label: "资金",
+          enlabel: "Endowment",
           disabled: false
         },
         {
           data: 15,
           label: "师资力量",
+          enlabel: "Faculty",
           disabled: false
         },
         {
           data: 15,
           label: "校友影响力",
+          enlabel: "Alumni",
           disabled: false
         }
       ],
@@ -166,8 +220,8 @@ export default {
         "Faculty",
         "Alumni"
       ],
+      language: "zh",
       params: {
-        language: "zh",
         weight: {
           Reputation: 0.3,
           "Academic Performance": 0.25,
@@ -192,6 +246,11 @@ export default {
       return (val * 100).toFixed(1) + "%";
     }
   },
+  computed: {
+    locale: function() {
+      return this.$i18n.locale;
+    }
+  },
   watch: {
     silderFrom: {
       handler(val) {
@@ -213,6 +272,10 @@ export default {
         }
       },
       deep: true
+    },
+    locale(newVal) {
+      console.log(newVal);
+      this.getCountryList();
     }
   },
   mounted() {
@@ -243,7 +306,8 @@ export default {
         ...{
           country: "",
           name: "",
-          pageNow: 1
+          pageNow: 1,
+          language: this.locale
         }
       };
       this.getRankList();
@@ -285,16 +349,15 @@ export default {
       this.getRankList();
     },
     // 大学名称点击跳转大学详情页
-    nameClick(name) {
-      console.log(name);
+    nameClick(data) {
+      console.log(data);
     },
     // 请求国家列表
     getCountryList() {
       let _opt = {
-        language: "zh"
+        language: this.locale
       };
       getCountryList(_opt).then(res => {
-        console.log(res);
         if (res.code === 200) {
           this.countryList = res.data.map(item => {
             return {
@@ -315,7 +378,11 @@ export default {
           if (res.code === 200) {
             this.total = res.data.pageInfo.total;
             for (let key in res.data.info) {
-              rankData.push(res.data.info[key]);
+              let _item = {
+                enName: key,
+                ...res.data.info[key]
+              };
+              rankData.push(_item);
             }
             rankData.sort((a, b) => {
               let _xh1 = a.xh;
@@ -348,6 +415,7 @@ export default {
   height: 100%;
   margin: 0 auto;
   display: flex;
+  cursor: default;
 }
 .homePage {
   min-height: calc(100% - 260px);
@@ -426,42 +494,39 @@ export default {
       li {
         position: relative;
         display: flex;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
       }
-      .label {
-        display: block;
-        width: 72px;
+      .labelBox {
+        display: flex;
+        flex-direction: column;
+        width: 80px;
         text-align: right;
         font-size: 14px;
         color: rgb(0, 0, 0);
-        line-height: 38px;
+      }
+      .label {
+        display: block;
       }
       .weight {
-        position: absolute;
         display: block;
-        width: 72px;
         text-align: right;
         font-size: 12px;
         color: rgb(0, 0, 0);
-        left: 0;
-        top: 25px;
         line-height: 20px;
       }
       .el-slider {
+        display: flex;
+        align-items: center;
         flex: 1;
         margin: 0 20px;
       }
       .disabledIcon {
         position: relative;
+        display: flex;
+        align-items: center;
         width: 22px;
-        height: 38px;
-        i {
-          position: absolute;
-          top: 8px;
-          left: 0;
-        }
       }
-      .el-icon-circle-check {
+      .el-icon-success {
         font-size: 22px;
         color: #4f63df;
       }
