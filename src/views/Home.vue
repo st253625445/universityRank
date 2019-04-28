@@ -370,7 +370,10 @@ export default {
     },
     // 请求排行
     getRankList() {
-      let _opt = this.params;
+      let _opt = {
+        language: this.locale,
+        ...this.params
+      };
       let rankData = [];
       this.loading = true;
       getRankList(_opt)
