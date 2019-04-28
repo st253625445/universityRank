@@ -16,6 +16,8 @@
             v-model="params.country"
             size="mini"
             :placeholder="$t('placeholder.country')"
+            @change="countrySelectChange"
+            @clear="countrySelectClear"
             clearable
           >
             <el-option
@@ -275,6 +277,7 @@ export default {
     },
     locale(newVal) {
       console.log(newVal);
+      this.params.country = "";
       this.getCountryList();
     }
   },
@@ -342,6 +345,14 @@ export default {
         }
       ];
       this.onSubmitSlider();
+    },
+    // 国家选择后清空学校名称输入框
+    countrySelectChange() {
+      this.params.name = "";
+    },
+    // 国家选择清空
+    countrySelectClear() {
+      this.params.country = "";
     },
     // 搜索按钮点击
     seachButtonClick() {
@@ -469,6 +480,9 @@ export default {
       border-color: #4f63df;
       color: #fff;
       cursor: pointer;
+    }
+    .el-icon-circle-close:before {
+      content: "\E79D";
     }
   }
   .rankBox {
