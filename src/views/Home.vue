@@ -481,9 +481,9 @@ export default {
       color: #fff;
       cursor: pointer;
     }
-    .el-icon-circle-close:before {
-      content: "\E79D";
-    }
+    // .el-icon-circle-close:before {
+    //   content: "\E79D";
+    // }
   }
   .rankBox {
     width: 880px;
