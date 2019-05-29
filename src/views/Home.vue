@@ -116,7 +116,7 @@
           </el-input>
         </div>
         <div class="buttonBox">
-          <el-button @click="resizeClick" size="mini">{{
+          <el-button type="primary" @click="resizeClick" size="mini">{{
             $t("placeholder.resetText")
           }}</el-button>
           <el-button
@@ -550,6 +550,9 @@ export default {
     text-align: left;
     p {
       padding: 10px 0;
+      color: #909399;
+      font-size: 14px;
+      font-weight: 700;
     }
     .countrySelectBox {
       > .el-select {
@@ -563,6 +566,14 @@ export default {
       justify-content: flex-end;
       > button {
         width: 100px;
+      }
+      .el-button--primary {
+        background-color: #4f63df;
+        border-color: #4f63df;
+        &.is-disabled {
+          background-color: #c0c4cc;
+          border-color: #c0c4cc;
+        }
       }
     }
   }
