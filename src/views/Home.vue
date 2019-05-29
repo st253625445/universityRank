@@ -164,7 +164,7 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="params.pageNow"
-        :page-sizes="[20, 50, 100]"
+        :page-sizes="[20, 25, 30, 50]"
         :page-size="params.pageSize"
         layout="total, prev, pager, next, sizes, jumper"
         :total="total"

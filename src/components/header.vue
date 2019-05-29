@@ -79,7 +79,7 @@ header {
     font-size: 16px;
     color: rgb(255, 255, 255);
     line-height: 50px;
-    padding-top: 10px;
+    padding-top: 5px;
     ul {
       display: flex;
     }

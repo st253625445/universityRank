@@ -12,9 +12,9 @@ const en = {
     ConfirmText: "Confirm"
   },
   indexPage: {
-    tableIndex: "index",
-    universityName: "Name of University",
-    scoreText: "score"
+    tableIndex: "Rank",
+    universityName: "University",
+    scoreText: "Score"
   },
   ...enLocale
 };

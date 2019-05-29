@@ -12,9 +12,9 @@ const zh = {
     ConfirmText: "确认"
   },
   indexPage: {
-    tableIndex: "序号",
-    universityName: "大学名称",
-    scoreText: "总分"
+    tableIndex: "排名",
+    universityName: "大学",
+    scoreText: "得分"
   },
   ...zhLocale
 };
