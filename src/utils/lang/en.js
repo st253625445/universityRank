@@ -4,9 +4,10 @@ const en = {
     title: "2019NiuPai"
   },
   placeholder: {
-    country: "country",
-    schoolSearch: "school name",
-    searchText: "GO",
+    countrySearchTitle: "Country/Region",
+    countrySearchText: "Global",
+    schoolSearchTitle: "School Name",
+    schoolSearchText: "School Name",
     resetText: "Reset",
     ConfirmText: "Confirm"
   },

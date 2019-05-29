@@ -3,11 +3,6 @@
     <div class="app-header">
       <div class="logo">{{ $t("message.title") }}</div>
       <div class="headerNav">
-        <!-- <ul>
-          <li>首页</li>
-          <li>全球大学</li>
-          <li>学院</li>
-        </ul> -->
         <el-select
           v-model="selectValue"
           size="mini"
@@ -24,7 +19,6 @@
         ></el-select>
       </div>
     </div>
-    <div class="adcolumn"></div>
   </header>
 </template>
 
@@ -65,6 +59,7 @@ header {
   width: 100%;
   background: #303483;
   .app-header {
+    position: relative;
     width: 1200px;
     height: 60px;
     margin: 0 auto;
@@ -73,11 +68,13 @@ header {
   .logo {
     flex: 1;
     font-size: 30px;
-    text-align: left;
+    text-align: center;
     color: rgb(255, 255, 255);
     line-height: 60px;
   }
   .headerNav {
+    position: absolute;
+    right: 0;
     display: flex;
     font-size: 16px;
     color: rgb(255, 255, 255);
@@ -97,11 +94,6 @@ header {
       background: transparent;
       color: #fff;
     }
-  }
-  .adcolumn {
-    width: 100%;
-    height: 200px;
-    background: #ffe63e;
   }
 }
 </style>

@@ -4,9 +4,10 @@ const zh = {
     title: "2019牛排"
   },
   placeholder: {
-    country: "选择国家",
-    schoolSearch: "请输入学校名称",
-    searchText: "搜索",
+    countrySearchTitle: "国家/地区",
+    countrySearchText: "全部",
+    schoolSearchTitle: "学校名称",
+    schoolSearchText: "请输入学校名称",
     resetText: "重置",
     ConfirmText: "确认"
   },
