@@ -116,6 +116,9 @@
           </el-input>
         </div>
         <div class="buttonBox">
+          <el-button @click="resizeClick" size="mini">{{
+            $t("placeholder.resetText")
+          }}</el-button>
           <el-button
             type="primary"
             @click="seachButtonClick"
@@ -123,21 +126,17 @@
             :disabled="!cansubmit"
             >{{ $t("placeholder.ConfirmText") }}</el-button
           >
-          <el-button @click="resizeClick" size="mini">{{
-            $t("placeholder.resetText")
-          }}</el-button>
         </div>
       </div>
     </div>
     <div class="page-container homeCountBox">
       <div class="rankCunt">
         <el-table :data="rankData" style="width: 100%">
-          <el-table-column :label="$t('indexPage.tableIndex')" width="65">
-            <template slot-scope="scope">
-              <span>
-                {{ scope.$index + (params.pageNow - 1) * params.pageSize + 1 }}
-              </span>
-            </template>
+          <el-table-column
+            prop="xh"
+            :label="$t('indexPage.tableIndex')"
+            width="80"
+          >
           </el-table-column>
           <el-table-column :label="$t('indexPage.universityName')">
             <template slot-scope="scope">
@@ -154,7 +153,7 @@
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('indexPage.scoreText')" width="100">
+          <el-table-column :label="$t('indexPage.scoreText')" width="80">
             <template slot-scope="scope">
               <span>{{ scope.row.score | numToFiexd }}</span>
             </template>
@@ -250,9 +249,7 @@ export default {
   },
   filters: {
     numToFiexd(val) {
-      if (val) {
-        return (val - 0).toFixed(2);
-      }
+      return (val - 0).toFixed(2);
     },
     weightFilter(val) {
       return (val * 100).toFixed(1) + "%";
@@ -446,6 +443,9 @@ export default {
           }
           this.loading = false;
           this.rankData = rankData;
+          if (rankData.length === 0 && _opt.name) {
+            this.$message.error("所选国家/区域无此大学");
+          }
         })
         .catch(rej => {
           this.loading = false;
