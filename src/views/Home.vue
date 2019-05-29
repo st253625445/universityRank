@@ -154,7 +154,7 @@
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column :label="$t('indexPage.scoreText')" width="60">
+          <el-table-column :label="$t('indexPage.scoreText')" width="100">
             <template slot-scope="scope">
               <span>{{ scope.row.score | numToFiexd }}</span>
             </template>
