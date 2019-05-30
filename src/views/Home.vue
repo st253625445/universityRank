@@ -29,7 +29,7 @@
             width="70"
           >
             <template slot-scope="scope">
-              <span>{{ (scope.row.weight / 100) | weightFilter }}</span>
+              <span>{{ scope.row.weight }}</span>
             </template>
           </el-table-column>
           <el-table-column :width="locale === 'zh' ? 120 : 150">
