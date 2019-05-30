@@ -6,6 +6,7 @@
           <el-table-column
             :label="locale === 'zh' ? '参数' : 'Parameter'"
             align="right"
+            :width="locale === 'zh' ? 120 : 170"
           >
             <template slot-scope="scope">
               <span>{{
@@ -13,7 +14,7 @@
               }}</span>
             </template>
           </el-table-column>
-          <el-table-column>
+          <el-table-column width="280">
             <template slot-scope="scope">
               <el-slider
                 v-model="scope.row.weight"
@@ -31,7 +32,7 @@
               <span>{{ (scope.row.weight / 100) | weightFilter }}</span>
             </template>
           </el-table-column>
-          <el-table-column width="150">
+          <el-table-column :width="locale === 'zh' ? 120 : 150">
             <template slot="header">
               <span>
                 {{ locale === "zh" ? "相对权重 " : "Relative Weight " }}
@@ -52,7 +53,7 @@
                 class="disabledIcon"
                 @click="scope.row.disabled = !scope.row.disabled"
               >
-                <i class="el-icon-success" v-if="!scope.row.disabled"></i>
+                <i class="el-icon-check" v-if="!scope.row.disabled"></i>
                 <i class="icon-disabled" v-else></i>
               </div>
             </template>
@@ -459,24 +460,27 @@ export default {
 
 <style lang="less">
 .page-container {
-  width: 1200px;
+  width: 1440px;
   height: 100%;
   margin: 0 auto;
   display: flex;
   cursor: default;
 }
 .homePage {
-  min-height: calc(100% - 260px);
+  min-height: calc(100% - 50px);
   .tabBox {
     background-color: rgb(255, 255, 255);
     border-bottom: 1px solid #ebeef5;
   }
   .silderBox {
     position: relative;
-    width: 700px;
-    padding: 20px;
+    padding: 20px 0;
+    margin-left: 130px;
     .rweightSpan {
       position: relative;
+    }
+    .el-table thead {
+      color: #000;
     }
     .disabledIcon {
       position: relative;
@@ -484,21 +488,34 @@ export default {
       align-items: center;
       width: 22px;
     }
-    .el-icon-success {
-      font-size: 22px;
-      color: #4f63df;
+    .el-icon-check {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      font-size: 17px;
+      color: #fff;
+      background: #5167dc;
+      border-radius: 2px;
     }
     .icon-disabled {
       width: 20px;
       height: 20px;
-      border-radius: 10px;
+      border-radius: 2px;
       border: 1px solid #cccccc;
     }
     .el-slider__bar {
-      background-color: #4f63df;
+      background-color: #5167dc;
     }
     .el-slider__button {
-      border-color: #4f63df;
+      border-color: #5167dc;
+    }
+    .el-slider__runway {
+      margin: 12px 0;
+    }
+    .el-slider__button-wrapper {
+      width: 30px;
+      height: 30px;
+      top: -12px;
     }
     .el-slider__runway.disabled .el-slider__bar {
       background-color: #cccccc;
@@ -522,7 +539,7 @@ export default {
       position: absolute;
       width: 500px;
       top: 20px;
-      left: 610px;
+      right: -450px;
       padding: 20px;
       font-size: 14px;
       line-height: 20px;
@@ -537,24 +554,25 @@ export default {
       p {
         padding: 5px 0;
       }
-      &.en {
-        left: 630px;
-      }
     }
   }
   .rightInputBox {
     display: flex;
-    width: 500px;
-    padding: 20px 100px;
+    width: 575px;
+    padding: 20px 0;
+    margin-left: auto;
+    padding-right: 175px;
     flex-direction: column;
     text-align: left;
     p {
-      padding: 10px 0;
-      color: #909399;
+      line-height: 20px;
+      padding-bottom: 6px;
+      color: #000;
       font-size: 14px;
       font-weight: 700;
     }
     .countrySelectBox {
+      margin-bottom: 14px;
       > .el-select {
         width: 100%;
       }
@@ -562,14 +580,14 @@ export default {
     .buttonBox {
       display: flex;
       height: 30px;
-      margin-top: 40px;
+      margin-top: 20px;
       justify-content: flex-end;
       > button {
         width: 100px;
       }
       .el-button--primary {
-        background-color: #4f63df;
-        border-color: #4f63df;
+        background-color: #5167dc;
+        border-color: #5167dc;
         &.is-disabled {
           background-color: #c0c4cc;
           border-color: #c0c4cc;
@@ -582,13 +600,14 @@ export default {
     flex-direction: column;
   }
   .rankCunt {
-    width: 100%;
-    padding: 40px 150px 0;
+    width: 700px;
+    padding-top: 40px;
+    margin: 0 auto;
     margin-bottom: 30px;
     .name {
       font-size: 14px;
-      padding: 5px 0;
-      color: rgb(79, 99, 223);
+      padding: 10px 0;
+      // color: #5167dc;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -610,9 +629,8 @@ export default {
       padding: 5px 0;
       border-bottom: none;
     }
-    .el-table,
     .el-table thead {
-      color: #000;
+      color: #5167dc;
     }
     .el-table_1_column_1 {
       text-align: center;

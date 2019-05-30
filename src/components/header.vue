@@ -57,29 +57,28 @@ export default {
 <style lang="less">
 header {
   width: 100%;
-  background: #303483;
+  background: #5167dc;
   .app-header {
     position: relative;
-    width: 1200px;
-    height: 60px;
+    width: 1440px;
+    height: 50px;
     margin: 0 auto;
     display: flex;
   }
   .logo {
     flex: 1;
-    font-size: 30px;
+    font-size: 28px;
     text-align: center;
     color: rgb(255, 255, 255);
-    line-height: 60px;
+    line-height: 50px;
   }
   .headerNav {
     position: absolute;
-    right: 0;
+    right: 40px;
     display: flex;
-    font-size: 16px;
+    font-size: 14px;
     color: rgb(255, 255, 255);
     line-height: 50px;
-    padding-top: 5px;
     ul {
       display: flex;
     }
