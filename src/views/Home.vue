@@ -511,6 +511,8 @@ export default {
     }
     .el-slider__runway {
       margin: 12px 0;
+      background-color: transparent;
+      border: 1px solid #909194;
     }
     .el-slider__button-wrapper {
       width: 30px;
