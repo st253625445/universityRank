@@ -29,7 +29,9 @@
             width="70"
           >
             <template slot-scope="scope">
-              <span>{{ scope.row.weight }}</span>
+              <span :class="{ grayText: scope.row.disabled }">
+                {{ scope.row.weight }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column :width="locale === 'zh' ? 120 : 150">
@@ -44,7 +46,9 @@
               ></i>
             </template>
             <template slot-scope="scope">
-              <span>{{ scope.row.rweight | weightFilter }}</span>
+              <span :class="{ grayText: scope.row.disabled }">
+                {{ scope.row.rweight | weightFilter }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column width="40">
@@ -478,6 +482,9 @@ export default {
     margin-left: 130px;
     .rweightSpan {
       position: relative;
+    }
+    .grayText {
+      color: rgb(209, 209, 209);
     }
     .el-table thead {
       color: #000;
