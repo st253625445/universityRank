@@ -609,11 +609,11 @@ export default {
     .name {
       font-size: 14px;
       padding: 10px 0;
-      // color: #5167dc;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      cursor: pointer;
+      // color: #5167dc;
+      // cursor: pointer;
     }
     .countryImg {
       width: 18px;
