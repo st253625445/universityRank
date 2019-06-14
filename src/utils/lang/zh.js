@@ -1,13 +1,18 @@
 import zhLocale from "element-ui/lib/locale/lang/zh-CN"; //引入element语言包
 const zh = {
   message: {
-    title: "2019牛排"
+    title: "牛排 - 世界大学排名",
+    footerText: "乌镇智库技术支持"
   },
   placeholder: {
+    continentSearchTitle: "大洲",
+    continentSearchText: "所有",
     countrySearchTitle: "国家/地区",
-    countrySearchText: "全部",
+    countrySearchText: "所有",
+    subjectSearchTitle: "学科专业",
+    subjectSearchText: "综合",
     schoolSearchTitle: "学校名称",
-    schoolSearchText: "请输入学校名称",
+    schoolSearchText: "输入学校名称快速定位",
     resetText: "重置",
     ConfirmText: "确认"
   },

@@ -2,16 +2,19 @@
   <div id="app">
     <HeaderBox />
     <router-view />
+    <FooterBox />
   </div>
 </template>
 <script>
 import HeaderBox from "@/components/header";
+import FooterBox from "@/components/footer";
 export default {
   data() {
     return {};
   },
   components: {
-    HeaderBox
+    HeaderBox,
+    FooterBox
   }
 };
 </script>

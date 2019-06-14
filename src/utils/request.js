@@ -5,15 +5,27 @@ import { Message } from "element-ui";
 const service = axios.create({
   timeout: 45000 // 请求超时时间
 });
+//  阻止频繁请求方法
+let CancelToken = axios.CancelToken;
+let pending = []; // 声明一个数组存储每个请求的取消函数跟标识
+let removePending = config => {
+  for (let p in pending) {
+    if (pending[p].u.split("?")[0] === config.url.split("?")[0]) {
+      pending[p].f(); // 执行取消请求
+      pending.splice(p, 1); // 数组中删除该请求
+    }
+  }
+};
 
 service.defaults.baseURL = "/api";
 
 // request拦截器
 service.interceptors.request.use(
   config => {
-    // if (store.getters.token) {
-    //   config.headers["authToken"] = getToken(); // 让每个请求携带自定义token 请根据实际情况自行修改
-    // }
+    removePending(config); //执行频繁请求时取消操作
+    config.cancelToken = new CancelToken(c => {
+      pending.push({ u: config.url, f: c });
+    });
     return config;
   },
   error => {
@@ -38,12 +50,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log("err" + error); // for debug
-    Message({
-      message: error.msg,
-      type: "error",
-      duration: 5 * 1000
-    });
+    return Promise.reject(error);
   }
 );
 

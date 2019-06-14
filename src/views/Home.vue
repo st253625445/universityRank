@@ -1,5 +1,5 @@
 <template>
-  <div class="homePage" v-loading="loading">
+  <div class="homePage">
     <div class="page-container tabBox">
       <div class="silderBox">
         <el-table :data="silderFrom" style="width: 100%">
@@ -25,7 +25,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            :label="locale === 'zh' ? '权重' : 'Weight'"
+            :label="locale === 'zh' ? '数值' : 'Value'"
             width="70"
           >
             <template slot-scope="scope">
@@ -34,16 +34,11 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column :width="locale === 'zh' ? 120 : 150">
+          <el-table-column width="70">
             <template slot="header">
               <span>
-                {{ locale === "zh" ? "相对权重 " : "Relative Weight " }}
+                {{ locale === "zh" ? "权重 " : "Weight " }}
               </span>
-              <i
-                class="el-icon-warning-outline"
-                @mouseover="showTooltipFn"
-                @mouseout="hideTooltipFn"
-              ></i>
             </template>
             <template slot-scope="scope">
               <span :class="{ grayText: scope.row.disabled }">
@@ -63,62 +58,71 @@
             </template>
           </el-table-column>
         </el-table>
-        <div class="tooltipBox" v-if="locale === 'zh' && showTooltip">
-          <p>
-            说明1：默认权重由乌镇智库设定，点击重置将恢复默认。
-          </p>
-          <p>
-            说明2：当5个因子比例之和等于100%时，按照标准百分百比例计算。当5个因子比例相加不等于100%时，按照对应比例计算。如只选择了声誉20%、学术能力20%时，其他因子占比为0%时，最终权重则为声誉与学术能力各占50%。
-          </p>
-        </div>
-        <div class="tooltipBox en" v-if="locale === 'en' && showTooltip">
-          <p>Explanation:</p>
-          <p>
-            1. The default value of each indicator has been set by Niupai.
-            Clicking “Reset” button, then it will back to the default value.
-          </p>
-          <p>
-            2. When the sum of ratios for all indicators equal 100%, each ratio
-            is calculated according to the setting value. When the sum of ratios
-            for all indicators do not equal 100%, each ratio is calculated
-            according to the corresponding value. For example, if you set 20%
-            Reputation and 20% Academic Performance, and set other indicators as
-            0%, then the final weights are 50% Reputation and 50% Academic
-            Performance.
-          </p>
-        </div>
       </div>
       <div class="rightInputBox">
+        <el-row type="flex">
+          <p class="continentLabel">
+            <span>{{ $t("placeholder.continentSearchTitle") }}</span>
+          </p>
+          <p class="countryLabel">
+            <span>{{ $t("placeholder.countrySearchTitle") }}</span>
+          </p>
+        </el-row>
+        <el-row type="flex">
+          <div class="continentSelectBox">
+            <el-select
+              v-model="params.continent"
+              size="mini"
+              :placeholder="$t('placeholder.continentSearchText')"
+              @clear="continentSelectClear"
+              clearable
+            >
+              <el-option
+                v-for="(item, index) in continentList"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </div>
+          <div class="countrySelectBox">
+            <el-select
+              v-model="params.country"
+              size="mini"
+              :placeholder="$t('placeholder.countrySearchText')"
+              @clear="countrySelectClear"
+              clearable
+            >
+              <el-option
+                v-for="(item, index) in countryListShow"
+                :key="index"
+                :label="item.country_cn || item.country_en"
+                :value="item.country_cn || item.country_en"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </el-row>
         <p>
-          <span>{{ $t("placeholder.countrySearchTitle") }}</span>
+          <span>{{ $t("placeholder.subjectSearchTitle") }}</span>
         </p>
-        <div class="countrySelectBox">
+        <div class="subjectSearchBox">
           <el-select
-            v-model="params.country"
+            v-model="params.subject"
             size="mini"
-            :placeholder="$t('placeholder.countrySearchText')"
-            @clear="countrySelectClear"
+            :placeholder="$t('placeholder.subjectSearchText')"
+            @clear="subjectSelectClear"
             clearable
           >
             <el-option
-              v-for="item in countryList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="(item, index) in subjectList"
+              :key="index"
+              :label="item"
+              :value="item"
             >
             </el-option>
           </el-select>
-        </div>
-        <p>
-          <span>{{ $t("placeholder.schoolSearchTitle") }}</span>
-        </p>
-        <div class="universitySearchBox">
-          <el-input
-            :placeholder="$t('placeholder.schoolSearchText')"
-            size="mini"
-            v-model="params.name"
-          >
-          </el-input>
         </div>
         <div class="buttonBox">
           <el-button type="primary" @click="resizeClick" size="mini">{{
@@ -135,7 +139,17 @@
       </div>
     </div>
     <div class="page-container homeCountBox">
-      <div class="rankCunt">
+      <div class="universitySearchBox">
+        <el-input
+          :placeholder="$t('placeholder.schoolSearchText')"
+          size="mini"
+          v-model="params.name"
+          @input="schoolInputChange"
+          clearable
+        >
+        </el-input>
+      </div>
+      <div class="rankCunt" v-loading="loading">
         <el-table :data="rankData" style="width: 100%">
           <el-table-column
             prop="xh"
@@ -187,9 +201,10 @@ export default {
   data() {
     return {
       loading: true,
+      continentList: [],
       countryList: [],
+      subjectList: [],
       cansubmit: true,
-      showTooltip: false,
       silderFrom: [
         {
           weight: 30,
@@ -245,7 +260,9 @@ export default {
           Faculty: 0.15,
           Alumni: 0.15
         },
+        continent: "",
         country: "",
+        subject: "",
         name: "",
         pageSize: 20,
         pageNow: 1
@@ -263,6 +280,15 @@ export default {
   computed: {
     locale: function() {
       return this.$i18n.locale;
+    },
+    countryListShow: function() {
+      if (this.params.continent) {
+        return this.countryList.filter(item => {
+          return item.continent === this.params.continent;
+        });
+      } else {
+        return this.countryList;
+      }
     }
   },
   watch: {
@@ -291,7 +317,8 @@ export default {
     },
     locale(newVal) {
       console.log(newVal);
-      this.params.country = "";
+      // 重置
+      this.resizeClick();
       this.loading = true;
       this.getCountryList("change");
     }
@@ -305,12 +332,6 @@ export default {
     formatTooltip(val) {
       return `${val}%`;
     },
-    showTooltipFn() {
-      this.showTooltip = true;
-    },
-    hideTooltipFn() {
-      this.showTooltip = false;
-    },
     handleSizeChange(val) {
       this.params.pageSize = val;
       this.getRankList();
@@ -323,13 +344,27 @@ export default {
     changeDisabled(index) {
       this.silderFrom[index].disabled = !this.silderFrom[index].disabled;
     },
+    // 大洲选择清空
+    continentSelectClear() {
+      this.params.continent = "";
+    },
     // 国家选择清空
     countrySelectClear() {
       this.params.country = "";
     },
+    // 学科选择清空
+    subjectSelectClear() {
+      this.params.subject = "";
+    },
+    // 学校名称变化
+    schoolInputChange() {
+      this.params.pageNow = 1;
+      this.getRankList();
+    },
     // 搜索按钮点击
     seachButtonClick() {
       this.params.pageNow = 1;
+      this.params.name = "";
       this.getRankList();
     },
     // 重置按钮
@@ -379,7 +414,9 @@ export default {
           Faculty: 0.15,
           Alumni: 0.15
         },
+        continent: "",
         country: "",
+        subject: "",
         name: "",
         pageSize: 20,
         pageNow: 1
@@ -398,12 +435,9 @@ export default {
       getCountryList(_opt)
         .then(res => {
           if (res.code === 200) {
-            this.countryList = res.data.map(item => {
-              return {
-                label: item,
-                value: item
-              };
-            });
+            this.continentList = res.data.continentList;
+            this.countryList = res.data.countryList;
+            this.subjectList = res.data.subjectList;
           }
           if (isChange) {
             this.loading = false;
@@ -471,10 +505,10 @@ export default {
   cursor: default;
 }
 .homePage {
-  min-height: calc(100% - 50px);
+  min-height: calc(100% - 83px);
   .tabBox {
     background-color: rgb(255, 255, 255);
-    border-bottom: 1px solid #ebeef5;
+    // border-bottom: 1px solid #ebeef5;
   }
   .silderBox {
     position: relative;
@@ -519,7 +553,7 @@ export default {
     .el-slider__runway {
       margin: 12px 0;
       background-color: transparent;
-      border: 1px solid #909194;
+      border: 1px solid #5167dc;
     }
     .el-slider__button-wrapper {
       width: 30px;
@@ -544,33 +578,13 @@ export default {
     .el-table::before {
       height: 0;
     }
-    .tooltipBox {
-      position: absolute;
-      width: 500px;
-      top: 20px;
-      right: -450px;
-      padding: 20px;
-      font-size: 14px;
-      line-height: 20px;
-      color: #606266;
-      text-align: justify;
-      border: 1px solid #e4e7ed;
-      border-radius: 4px;
-      background-color: #fff;
-      -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-      z-index: 3000;
-      p {
-        padding: 5px 0;
-      }
-    }
   }
   .rightInputBox {
     display: flex;
     width: 575px;
     padding: 20px 0;
     margin-left: auto;
-    padding-right: 175px;
+    padding-right: 115px;
     flex-direction: column;
     text-align: left;
     p {
@@ -580,11 +594,24 @@ export default {
       font-size: 14px;
       font-weight: 700;
     }
-    .countrySelectBox {
+    .continentLabel {
+      width: 240px;
+      padding-right: 20px;
+    }
+    .countryLabel {
+      width: 220px;
+    }
+    .el-select {
+      width: 100%;
+    }
+    .continentSelectBox {
+      width: 240px;
       margin-bottom: 14px;
-      > .el-select {
-        width: 100%;
-      }
+      padding-right: 20px;
+    }
+    .countrySelectBox {
+      width: 220px;
+      margin-bottom: 14px;
     }
     .buttonBox {
       display: flex;
@@ -608,9 +635,14 @@ export default {
     padding-bottom: 50px;
     flex-direction: column;
   }
+  .universitySearchBox {
+    width: 700px;
+    padding-top: 20px;
+    margin: 0 auto;
+  }
   .rankCunt {
     width: 700px;
-    padding-top: 40px;
+    padding-top: 20px;
     margin: 0 auto;
     margin-bottom: 30px;
     .name {
