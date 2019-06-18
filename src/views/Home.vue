@@ -482,9 +482,6 @@ export default {
           }
           this.loading = false;
           this.rankData = rankData;
-          if (rankData.length === 0 && _opt.name) {
-            this.$message.error("所选国家/区域无此大学");
-          }
         })
         .catch(rej => {
           this.loading = false;
