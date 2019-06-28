@@ -19,7 +19,15 @@ export function getRankList(params) {
 // 获取大学数据
 export function getDetailBySch(params) {
   return request({
-    url: `/rank/getDetailBySch`,
+    url: `/rank/getSchInfo`,
+    method: "post",
+    data: params
+  });
+}
+// 获取更多图片
+export function getMoreImages(params) {
+  return request({
+    url: `/rank/getMoreImages`,
     method: "post",
     data: params
   });

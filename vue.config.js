@@ -4,7 +4,7 @@ module.exports = {
     proxy: {
       "/api": {
         // 代理地址
-        target: "http://192.168.1.221:8095/api", // 需要代理的地址
+        target: "http://192.168.1.223:8074/api", // 需要代理的地址
         changeOrigin: true, // 是否跨域
         secure: false,
         pathRewrite: {

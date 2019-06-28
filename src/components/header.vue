@@ -60,7 +60,7 @@ header {
   background: #5167dc;
   .app-header {
     position: relative;
-    width: 1440px;
+    width: 100%;
     height: 50px;
     margin: 0 auto;
     display: flex;

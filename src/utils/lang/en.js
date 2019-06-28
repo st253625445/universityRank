@@ -1,13 +1,13 @@
 import enLocale from "element-ui/lib/locale/lang/en"; //引入element语言包
 const en = {
   message: {
-    title: "Niu Pai - World University Ranking",
+    title: "NiKePai Global University Ranking",
     footerText: "Powered by WuZhen Institute"
   },
   placeholder: {
     continentSearchTitle: "Continent",
     continentSearchText: "All",
-    countrySearchTitle: "Country/Region",
+    countrySearchTitle: "Region",
     countrySearchText: "All",
     subjectSearchTitle: "Subject",
     subjectSearchText: "Overall",

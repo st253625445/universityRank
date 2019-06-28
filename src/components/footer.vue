@@ -20,7 +20,7 @@ footer {
   background: #5167dc;
   .app-footer {
     position: relative;
-    width: 1440px;
+    width: 100%;
     margin: 0 auto;
     text-align: center;
     font-size: 14px;

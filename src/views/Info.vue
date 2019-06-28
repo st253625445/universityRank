@@ -1,71 +1,364 @@
 <template>
-  <div class="infoPage">
-    <div class="page-container">
-      <div class="infoBox">
-        <p class="name">{{ infoData.name }}</p>
-        <p class="title">基本信息</p>
-        <ul>
-          <li>
-            <span class="infoTitle">中文名</span>
-            <p>{{ infoData.infobox.name }}</p>
-          </li>
-          <li>
-            <span class="infoTitle">外文名</span>
-            <p>Tsinghua University</p>
-          </li>
-          <li>
-            <span class="infoTitle">简称</span>
-            <p>清华</p>
-          </li>
-          <li>
-            <span class="infoTitle">创办时间</span>
-            <p>1911年</p>
-          </li>
-          <li>
-            <span class="infoTitle">类别</span>
-            <p>公立大学</p>
-          </li>
-          <li>
-            <span class="infoTitle">类型</span>
-            <p>综合</p>
-          </li>
-          <li>
-            <span class="infoTitle">属性</span>
-            <p>综合</p>
-          </li>
-        </ul>
-        <img src="" alt="" class="logoImg" />
-        <p class="desText">{{ infoData.des }}</p>
+  <div class="infoPage" v-loading="infoPageLoading">
+    <div class="titleBox">
+      <div class="univLogoBox">
+        <el-image class="img" :src="image_sch" lazy></el-image>
       </div>
-      <div class="newsBox"></div>
+      <div class="univContent">
+        <p class="title">{{ name }}</p>
+        <p
+          class="content"
+          :class="{ showOverflow: abstractShow }"
+          ref="abstract"
+          @mouseenter="abstractShowFn(true)"
+          @mouseleave="abstractShowFn(false)"
+        >
+          {{ abstract }}
+        </p>
+        <span class="more" v-if="hasMoreAbstract && !abstractShow">...</span>
+      </div>
     </div>
+    <div class="infoBox" v-show="!abstractShow && !noData">
+      <div class="infoItem" v-for="(value, key) in infoData" :key="key">
+        <span class="infiItemLabel">{{ key }}</span>
+        <span class="infiItemContent" v-html="value"></span>
+      </div>
+    </div>
+    <div class="toolBox" v-show="!infoPageLoading && !abstractShow && !noData">
+      <div class="toolItem">
+        <div class="toolTitle">校园图集</div>
+        <div class="toolItemCount unviImages">
+          <el-carousel height="200px" indicator-position="none">
+            <el-carousel-item v-for="(item, index) in srcList" :key="index">
+              <el-image :src="`${item.url}.${item.type}`" lazy> </el-image>
+            </el-carousel-item>
+          </el-carousel>
+          <el-button
+            type="primary"
+            class="moreImagesButton"
+            @click="showImagePop"
+          >
+            查看更多
+          </el-button>
+        </div>
+      </div>
+      <div class="toolItem" v-if="isChinaUnvi">
+        <div class="toolTitle">地图信息</div>
+        <div class="toolItemCount toolMapBox">
+          <baidu-map
+            class="toolMapCount"
+            :class="{ toolMapCountPop: baiduMapPop }"
+            :center="coordinate"
+            :zoom="15"
+            :scroll-wheel-zoom="true"
+          >
+            <bm-marker :position="coordinate" :dragging="true"> </bm-marker>
+            <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
+          </baidu-map>
+          <!-- <i
+            class="el-icon-full-screen baiduMapPopShow"
+            @click="baiduMapPopShow"
+          ></i>
+          <i
+            class="el-icon-close baiduMapPopClose"
+            v-if="baiduMapPop"
+            @click="baiduMapPop = false"
+          ></i> -->
+        </div>
+      </div>
+      <div class="toolItem" v-if="!isChinaUnvi">
+        <div class="toolTitle">地图信息</div>
+        <div class="toolItemCount toolMapBox">
+          <gmap-map
+            class="toolMapCount"
+            :center="coordinate"
+            :zoom="15"
+            :scroll-wheel-zoom="true"
+          >
+            <gmap-marker :position="coordinate" :dragging="true"></gmap-marker>
+          </gmap-map>
+        </div>
+      </div>
+      <div class="toolItem" v-if="isChinaUnvi">
+        <div class="toolTitle">录取分数线</div>
+        <div class="toolItemCount">
+          <div class="topSelect">
+            <el-select size="mini" v-model="scoreSelect.batch">
+              <el-option
+                v-for="(item, index) in batchList"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <el-select size="mini" v-model="scoreSelect.subject">
+              <el-option
+                v-for="(item, index) in subjectList"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+            <el-select size="mini" v-model="scoreSelect.region">
+              <el-option
+                v-for="(item, index) in regionList"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </div>
+          <el-table :data="scoreListShow" height="185" class="scoreListBox">
+            <el-table-column prop="year" label="年份"> </el-table-column>
+            <el-table-column prop="lowScore" label="最低分"> </el-table-column>
+            <el-table-column prop="averageScore" label="平均分">
+            </el-table-column>
+            <el-table-column prop="controlScore" label="批次分">
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+      <div class="toolItem" v-if="!isChinaUnvi">
+        <div class="toolTitle">申请要求</div>
+        <div class="toolItemCount requireBox">
+          <ul>
+            <li v-for="(value, key) in requireList" :key="key">
+              <span class="label">{{ key }}</span>
+              <div class="count">
+                <div class="bg"></div>
+                <div class="requireValue" :style="requireItemStyle(value)">
+                  {{ requireItemValue(value) }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <template v-if="imagePopShow">
+      <ImagesPop @hidePop="hideImagePop"></ImagesPop>
+    </template>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import { getDetailBySch } from "@/API/getData";
+
+import ImagesPop from "@/components/imagesPop";
 export default {
   name: "info",
   data() {
     return {
-      infoData: {}
+      noData: true, // 是否无数据
+      infoPageLoading: true,
+      name: "",
+      image_sch: "",
+      abstract: "",
+      infoData: {},
+      isChinaUnvi: true,
+      hasMoreAbstract: false, // 简介是否有隐藏部分
+      abstractShow: false, // 简介是否展开
+      baiduMapPop: false,
+      coordinate: { lng: 0, lat: 0 },
+      srcList: [],
+      scoreSelect: {
+        region: "",
+        subject: "文科",
+        batch: ""
+      },
+      scoreList: {},
+      requireList: {},
+      imagePopShow: false
     };
   },
-  components: {},
-  mounted() {
+  computed: {
+    locale: function() {
+      return this.$i18n.locale;
+    },
+    regionList: function() {
+      let _score = this.scoreList;
+      // let _subject = this.scoreSelect.subject;
+      let _subject = this.scoreSelect.subject === "文科" ? "arts" : "science";
+      let _return = [];
+      if (_score && _subject && _score[_subject]) {
+        _return = Object.keys(_score[_subject]);
+      }
+      return _return;
+    },
+    subjectList: function() {
+      // let _score = this.scoreList;
+      // let _return = Object.keys(_score);
+      let _return = ["文科", "理科"];
+      return _return;
+    },
+    batchList: function() {
+      let _score = this.scoreList;
+      let _region = this.scoreSelect.region;
+      // let _subject = this.scoreSelect.subject;
+      let _subject = this.scoreSelect.subject === "文科" ? "arts" : "science";
+      let _return = [];
+      if (_score && _region && _subject) {
+        _return = Object.keys(_score[_subject][_region]);
+      }
+      return _return;
+    },
+    scoreListShow: function() {
+      let _score = this.scoreList;
+      let _region = this.scoreSelect.region;
+      // let _subject = this.scoreSelect.subject;
+      let _subject = this.scoreSelect.subject === "文科" ? "arts" : "science";
+      let _batch = this.scoreSelect.batch;
+      let _return = [];
+      if (_score && _region && _subject && _batch) {
+        _return = _score[_subject][_region][_batch];
+      }
+      return _return;
+    },
+    requireItemStyle() {
+      return function(value) {
+        return this.requireItemStyleFn(value);
+      };
+    },
+    requireItemValue() {
+      return function(value) {
+        return this.requireItemValueFn(value);
+      };
+    }
+  },
+  watch: {
+    locale(newVal) {
+      console.log(newVal);
+      this.infoPageLoading = true;
+      let query = this.$route.query;
+      if (query.cnName || query.enName) {
+        this.getDetailBySch(query);
+      }
+    },
+    subjectList(val) {
+      this.scoreSelect.subject = val[0];
+    },
+    regionList(val) {
+      let _oldRegion = this.scoreSelect.region;
+      if (val.indexOf(_oldRegion) !== -1) {
+        return false;
+      }
+      if (val.indexOf("beijing") !== -1) {
+        this.scoreSelect.region = "beijing";
+      } else if (val.indexOf("北京") !== -1) {
+        this.scoreSelect.region = "北京";
+      } else {
+        this.scoreSelect.region = val[0];
+      }
+    },
+    batchList(val) {
+      let _oldBatch = this.scoreSelect.batch;
+      if (val.indexOf(_oldBatch) !== -1) {
+        return false;
+      }
+      if (val.indexOf("本科一批") !== -1) {
+        this.scoreSelect.batch = "本科一批";
+        return false;
+      } else if (val.indexOf("本科批") !== -1) {
+        this.scoreSelect.batch = "本科批";
+        return false;
+      } else {
+        this.scoreSelect.batch = val[0];
+      }
+    },
+    abstract(val) {
+      this.$nextTick(() => {
+        let _DOM = this.$refs.abstract;
+        let _scrollH = _DOM.scrollHeight;
+        let _clientH = _DOM.clientHeight;
+        if (_clientH < _scrollH) {
+          this.hasMoreAbstract = true;
+        }
+      });
+    }
+  },
+  components: { ImagesPop },
+  created() {
     let query = this.$route.query;
-    if (query.name) {
+    if (query.cnName || query.enName) {
       this.getDetailBySch(query);
     }
   },
   methods: {
     // 请求大学信息
     getDetailBySch(data) {
-      getDetailBySch(data).then(res => {
-        console.log(res);
-        this.infoData = res.data;
+      let _query = {
+        language: this.locale,
+        name: data.enName
+      };
+      this.noData = false;
+      getDetailBySch(_query)
+        .then(res => {
+          let _keys = Object.keys(res.data);
+          if (res.code === 200 && _keys.length !== 0) {
+            this.name = res.data.name;
+            this.abstract = res.data.abstract;
+            this.image_sch = res.data.image_sch;
+            this.isChinaUnvi = res.data.isChineseUnvi === "true";
+            this.infoData = res.data.infobox;
+            this.srcList = res.data.images || [];
+            this.coordinate.lng =
+              res.data.coordinate && res.data.coordinate.longitude;
+            this.coordinate.lat =
+              res.data.coordinate && res.data.coordinate.latitude;
+            this.requireList = this.scoreList = res.data.score;
+          } else {
+            this.noData = true;
+          }
+          this.$nextTick(() => {
+            this.infoPageLoading = false;
+          });
+        })
+        .catch(rej => {
+          console.log(rej);
+          this.noData = true;
+          this.$nextTick(() => {
+            this.infoPageLoading = false;
+          });
+        });
+    },
+    // 展开隐藏的简介内容
+    abstractShowFn(data) {
+      if (this.hasMoreAbstract) {
+        this.abstractShow = data;
+      }
+    },
+    baiduMapPopShow() {
+      this.baiduMapPop = true;
+      this.$nextTick(() => {
+        console.log(this);
       });
+    },
+    subjectSelectClear() {},
+    requireItemStyleFn(data) {
+      let _right = ((data.all - data.end) / data.all) * 100 + "%";
+      let _minW = ((data.end - data.start) / data.all) * 100 + "%";
+      let _teturn = {
+        right: _right,
+        minWidth: _minW
+      };
+      return _teturn;
+    },
+    requireItemValueFn(data) {
+      if (data.start && data.end) {
+        return `${data.start}-${data.end}`;
+      } else {
+        return `${data.start}` || `${data.end}` || "";
+      }
+    },
+    showImagePop() {
+      this.imagePopShow = true;
+    },
+    hideImagePop() {
+      this.imagePopShow = false;
     }
   }
 };
@@ -73,53 +366,273 @@ export default {
 
 <style lang="less">
 .infoPage {
-  min-height: calc(100% - 260px);
-  .infoBox {
-    position: relative;
-    width: 900px;
-    padding: 20px;
-    text-align: left;
-    .name {
-      font-size: 30px;
-      color: rgb(0, 0, 0);
+  min-height: calc(100% - 83px);
+  width: 800px;
+  margin: 0 auto;
+  padding: 50px 0;
+  text-align: left;
+  .titleBox {
+    width: 100%;
+    display: flex;
+    font-size: 12px;
+    line-height: 18px;
+    color: #101010;
+    margin-bottom: 50px;
+    .univLogoBox {
+      width: 180px;
+      margin-right: 75px;
+      .img {
+        width: 180px;
+        height: 180px;
+      }
     }
-    .title {
-      font-size: 14px;
-      line-height: 50px;
-      color: rgb(0, 0, 0);
-    }
-    ul {
-      width: 600px;
-    }
-    li {
-      display: flex;
-      font-size: 14px;
-      line-height: 24px;
-      color: rgb(102, 102, 102);
-    }
-    .infoTitle {
-      width: 80px;
-      color: rgb(51, 51, 51);
-    }
-    .logoImg {
-      position: absolute;
-      width: 200px;
-      height: 200px;
-      right: 20px;
-      top: 20px;
-      border: 1px solid #eeeeee;
-    }
-    .desText {
-      margin-top: 30px;
-      text-indent: 2em;
-      font-size: 14px;
-      color: rgb(102, 102, 102);
+    .univContent {
+      position: relative;
+      flex: 1;
+      .title {
+        font-size: 28px;
+        line-height: 40px;
+        margin-bottom: 40px;
+      }
+      .content {
+        text-align: justify;
+        height: 126px;
+        overflow: hidden;
+        &.showOverflow {
+          height: auto;
+          overflow: auto;
+          background: #e6eaff;
+          padding: 5px;
+        }
+      }
+      .more {
+        position: absolute;
+        bottom: -30px;
+        right: 0;
+        padding: 10px 15px;
+      }
     }
   }
-  .newsBox {
-    flex: 1;
-    margin: 20px 0;
-    border: 1px solid #eeeeee;
+  .infoBox {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 12px;
+    line-height: 24px;
+    color: #101010;
+    margin-bottom: 50px;
+    .infoItem {
+      width: 50%;
+      display: flex;
+      padding-right: 10px;
+      &:nth-child(2n) {
+        padding-left: 10px;
+        padding-right: 0;
+      }
+    }
+    .infiItemLabel {
+      width: 140px;
+      padding-right: 20px;
+      font-weight: bold;
+    }
+    .infiItemContent {
+      flex: 1;
+      white-space: pre-line;
+    }
+  }
+  .toolBox {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    .toolItem {
+      position: relative;
+      width: 50%;
+      padding-right: 10px;
+      margin-bottom: 40px;
+      &:nth-child(2n) {
+        padding-left: 10px;
+        padding-right: 0;
+      }
+    }
+    .toolTitle {
+      position: absolute;
+      left: 16px;
+      top: -15px;
+      font-size: 14px;
+      line-height: 30px;
+      padding: 0 15px;
+      background: #fff;
+      z-index: 2;
+    }
+    .toolItemCount {
+      position: relative;
+      width: 100%;
+      padding: 20px;
+      min-height: 260px;
+      border: 1px solid #5066dc;
+    }
+    .unviImages {
+      padding: 20px 40px 40px;
+    }
+    .toolMapBox {
+      padding: 20px;
+    }
+    .moreImagesButton {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      font-size: 12px;
+      height: 20px;
+      line-height: 20px;
+      padding: 0 20px;
+      background: #5167dc;
+      transform: translate(-50%, 0);
+    }
+    .toolMapCount {
+      width: 100%;
+      height: 220px;
+      &.toolMapCountPop {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: calc(100%);
+        z-index: 1050;
+      }
+    }
+    .baiduMapPopShow {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      line-height: 40px;
+      color: #fff;
+      right: 30px;
+      top: 30px;
+      background: rgba(78, 78, 78, 0.6);
+    }
+    .baiduMapPopClose {
+      position: fixed;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      line-height: 40px;
+      color: #fff;
+      right: 30px;
+      top: 30px;
+      background: rgba(78, 78, 78, 0.6);
+      z-index: 1051;
+    }
+    .pano_close {
+      top: auto;
+      bottom: 10px;
+    }
+    .topSelect {
+      display: flex;
+      flex-direction: row-reverse;
+      .el-select--mini {
+        line-height: 20px;
+        margin-left: 8px;
+        .el-input__inner {
+          padding-left: 8px;
+          padding-right: 18px;
+          height: 20px;
+          line-height: 20px;
+        }
+        .el-input__icon {
+          width: 15px;
+          height: 20px;
+          line-height: 20px;
+        }
+        &:nth-child(1) {
+          width: 90px;
+        }
+        &:nth-child(2) {
+          width: 60px;
+        }
+        &:nth-child(3) {
+          width: 60px;
+        }
+      }
+    }
+    .scoreListBox {
+      width: 100%;
+      height: 185px;
+      margin-top: 15px;
+      .cell {
+        text-align: center;
+        line-height: 30px;
+      }
+      td {
+        padding: 0;
+        border-bottom: none;
+      }
+      th {
+        padding: 0;
+        font-size: 14px;
+        line-height: 40px;
+        border-bottom: none;
+        background: #5167dc;
+        color: #fff;
+        border-right: 1px solid #fff;
+        font-weight: normal;
+        &.gutter {
+          background: #fff;
+        }
+      }
+      &::before {
+        height: 0;
+      }
+    }
+    .requireBox {
+      padding: 40px 20px;
+      > ul {
+        max-height: 100%;
+      }
+      li {
+        display: flex;
+        width: 100%;
+        height: 36px;
+        .label {
+          height: 100%;
+          font-size: 14px;
+          line-height: 36px;
+          width: 70px;
+          text-align: left;
+        }
+        .count {
+          flex: 1;
+          position: relative;
+          height: 100%;
+          border-left: 1px solid #e8e8e8;
+        }
+        .bg {
+          position: absolute;
+          width: 100%;
+          height: 20px;
+          left: 0;
+          top: 8px;
+          background: #e8e8e8;
+        }
+        .requireValue {
+          position: absolute;
+          height: 28px;
+          top: 4px;
+          padding: 0 10px;
+          text-align: center;
+          background: #5167dc;
+          border-radius: 5px;
+          color: #fff;
+          font-size: 12px;
+          line-height: 28px;
+        }
+      }
+    }
+  }
+
+  .el-image {
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

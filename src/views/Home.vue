@@ -1,113 +1,22 @@
 <template>
   <div class="homePage">
-    <div class="page-container tabBox">
-      <div class="silderBox">
-        <el-table :data="silderFrom" style="width: 100%">
-          <el-table-column
-            :label="locale === 'zh' ? '参数' : 'Parameter'"
-            align="right"
-            :width="locale === 'zh' ? 120 : 170"
+    <div class="topSelect">
+      <el-row class="selectBox" type="flex">
+        <img src="../assets/img/huakuai.svg" alt="" @click="popShow = true" />
+        <span>{{ $t("placeholder.countrySearchTitle") }}</span>
+        <div class="reginSelect">
+          <el-cascader
+            v-model="region"
+            size="mini"
+            :placeholder="$t('placeholder.continentSearchText')"
+            :options="regionList"
+            @change="regionChange"
+            clearable
           >
-            <template slot-scope="scope">
-              <span>{{
-                locale === "zh" ? scope.row.label : scope.row.enlabel
-              }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column width="280">
-            <template slot-scope="scope">
-              <el-slider
-                v-model="scope.row.weight"
-                :step="5"
-                :format-tooltip="formatTooltip"
-                :disabled="scope.row.disabled"
-              ></el-slider>
-            </template>
-          </el-table-column>
-          <el-table-column
-            :label="locale === 'zh' ? '数值' : 'Value'"
-            width="70"
-          >
-            <template slot-scope="scope">
-              <span :class="{ grayText: scope.row.disabled }">
-                {{ scope.row.weight }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column width="70">
-            <template slot="header">
-              <span>
-                {{ locale === "zh" ? "权重 " : "Weight " }}
-              </span>
-            </template>
-            <template slot-scope="scope">
-              <span :class="{ grayText: scope.row.disabled }">
-                {{ scope.row.rweight | weightFilter }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column width="40">
-            <template slot-scope="scope">
-              <div
-                class="disabledIcon"
-                @click="scope.row.disabled = !scope.row.disabled"
-              >
-                <i class="el-icon-check" v-if="!scope.row.disabled"></i>
-                <i class="icon-disabled" v-else></i>
-              </div>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
-      <div class="rightInputBox">
-        <el-row type="flex">
-          <p class="continentLabel">
-            <span>{{ $t("placeholder.continentSearchTitle") }}</span>
-          </p>
-          <p class="countryLabel">
-            <span>{{ $t("placeholder.countrySearchTitle") }}</span>
-          </p>
-        </el-row>
-        <el-row type="flex">
-          <div class="continentSelectBox">
-            <el-select
-              v-model="params.continent"
-              size="mini"
-              :placeholder="$t('placeholder.continentSearchText')"
-              @clear="continentSelectClear"
-              clearable
-            >
-              <el-option
-                v-for="(item, index) in continentList"
-                :key="index"
-                :label="item"
-                :value="item"
-              >
-              </el-option>
-            </el-select>
-          </div>
-          <div class="countrySelectBox">
-            <el-select
-              v-model="params.country"
-              size="mini"
-              :placeholder="$t('placeholder.countrySearchText')"
-              @clear="countrySelectClear"
-              clearable
-            >
-              <el-option
-                v-for="(item, index) in countryListShow"
-                :key="index"
-                :label="item.country_cn || item.country_en"
-                :value="item.country_cn || item.country_en"
-              >
-              </el-option>
-            </el-select>
-          </div>
-        </el-row>
-        <p>
-          <span>{{ $t("placeholder.subjectSearchTitle") }}</span>
-        </p>
-        <div class="subjectSearchBox">
+          </el-cascader>
+        </div>
+        <span>{{ $t("placeholder.subjectSearchTitle") }}</span>
+        <div class="subjectSelect">
           <el-select
             v-model="params.subject"
             size="mini"
@@ -118,27 +27,23 @@
             <el-option
               v-for="(item, index) in subjectList"
               :key="index"
-              :label="item"
-              :value="item"
+              :label="item.value"
+              :value="item.value"
             >
             </el-option>
           </el-select>
         </div>
-        <div class="buttonBox">
-          <el-button type="primary" @click="resizeClick" size="mini">{{
-            $t("placeholder.resetText")
-          }}</el-button>
-          <el-button
-            type="primary"
-            @click="seachButtonClick"
-            size="mini"
-            :disabled="!cansubmit"
-            >{{ $t("placeholder.ConfirmText") }}</el-button
-          >
-        </div>
-      </div>
-    </div>
-    <div class="page-container homeCountBox">
+        <el-button type="primary" @click="resizeClick" size="mini">{{
+          $t("placeholder.resetText")
+        }}</el-button>
+        <el-button
+          type="primary"
+          @click="seachButtonClick"
+          size="mini"
+          :disabled="!cansubmit"
+          >{{ $t("placeholder.ConfirmText") }}</el-button
+        >
+      </el-row>
       <div class="universitySearchBox">
         <el-input
           :placeholder="$t('placeholder.schoolSearchText')"
@@ -149,6 +54,65 @@
         >
         </el-input>
       </div>
+      <transition name="el-zoom-in-top">
+        <div class="popSliderBox" v-show="popShow" v-clickoutside="popOutClick">
+          <el-table :data="silderFromShow" style="width: 100%">
+            <el-table-column
+              :label="locale === 'zh' ? '参数' : 'Parameter'"
+              align="right"
+              :width="locale === 'zh' ? 120 : 170"
+            >
+              <template slot-scope="scope">
+                <span>{{
+                  locale === "zh" ? scope.row.label : scope.row.enlabel
+                }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column width="280">
+              <template slot-scope="scope">
+                <el-slider
+                  v-model="scope.row.weight"
+                  :step="5"
+                  :format-tooltip="formatTooltip"
+                  :disabled="scope.row.disabled"
+                ></el-slider>
+              </template>
+            </el-table-column>
+            <el-table-column
+              :label="locale === 'zh' ? '数值' : 'Value'"
+              width="70"
+            >
+              <template slot-scope="scope">
+                <span :class="{ grayText: scope.row.disabled }">
+                  {{ scope.row.weight }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column width="70">
+              <template slot="header">
+                <span>
+                  {{ locale === "zh" ? "权重 " : "Weight " }}
+                </span>
+              </template>
+              <template slot-scope="scope">
+                <span :class="{ grayText: scope.row.disabled }">
+                  {{ scope.row.rweight | weightFilter }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column width="40">
+              <template slot-scope="scope">
+                <div class="disabledIcon" @click="changeDisabled(scope.$index)">
+                  <i class="el-icon-check" v-if="!scope.row.disabled"></i>
+                  <i class="icon-disabled" v-else></i>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </transition>
+    </div>
+    <div class="page-container homeCountBox">
       <div class="rankCunt" v-loading="loading">
         <el-table :data="rankData" style="width: 100%">
           <el-table-column
@@ -194,6 +158,7 @@
 </template>
 
 <script>
+import Clickoutside from "element-ui/src/utils/clickoutside";
 import { getCountryList, getRankList } from "@/API/getData";
 
 export default {
@@ -201,42 +166,44 @@ export default {
   data() {
     return {
       loading: true,
+      popShow: false,
       continentList: [],
       countryList: [],
+      regionList: [],
       subjectList: [],
       cansubmit: true,
       silderFrom: [
         {
-          weight: 30,
-          rweight: 0.3,
+          weight: 0,
+          rweight: 0,
           label: "声誉",
           enlabel: "Reputation",
           disabled: false
         },
         {
-          weight: 25,
-          rweight: 0.25,
+          weight: 0,
+          rweight: 0,
           label: "学术能力",
           enlabel: "Academic Performance",
           disabled: false
         },
         {
-          weight: 15,
-          rweight: 0.15,
+          weight: 0,
+          rweight: 0,
           label: "资金",
           enlabel: "Endowment",
           disabled: false
         },
         {
-          weight: 15,
-          rweight: 0.15,
+          weight: 0,
+          rweight: 0,
           label: "师资力量",
           enlabel: "Faculty",
           disabled: false
         },
         {
-          weight: 15,
-          rweight: 0.15,
+          weight: 0,
+          rweight: 0,
           label: "校友影响力",
           enlabel: "Alumni",
           disabled: false
@@ -252,13 +219,14 @@ export default {
         "Alumni"
       ],
       language: "zh",
+      region: [],
       params: {
         weight: {
-          Reputation: 0.3,
-          "Academic Performance": 0.25,
-          Endowment: 0.15,
-          Faculty: 0.15,
-          Alumni: 0.15
+          Reputation: 0,
+          "Academic Performance": 0,
+          Endowment: 0,
+          Faculty: 0,
+          Alumni: 0
         },
         continent: "",
         country: "",
@@ -281,16 +249,41 @@ export default {
     locale: function() {
       return this.$i18n.locale;
     },
-    countryListShow: function() {
-      if (this.params.continent) {
-        return this.countryList.filter(item => {
-          return item.continent === this.params.continent;
-        });
+    silderFromShow: function() {
+      let _subject = this.params.subject;
+      let _return = [];
+      let _fn = data => {
+        for (let i = 0; i < this.silderFrom.length; i++) {
+          let _silder = this.silderFrom[i];
+          _silder.disabled = false;
+          for (let key in data) {
+            if (_silder.enlabel === key) {
+              _silder.weight = data[key];
+              _return.push(_silder);
+              break;
+            } else {
+              _silder.weight = 0;
+            }
+          }
+        }
+      };
+      if (_subject) {
+        let _parameters = this.subjectList.filter(item => {
+          return item.value === _subject;
+        })[0].parameters;
+        _fn(_parameters);
       } else {
-        return this.countryList;
+        if (this.subjectList.length > 0) {
+          let _parameters = this.subjectList[0].parameters;
+          _fn(_parameters);
+        } else {
+          _return = this.silderFrom;
+        }
       }
+      return _return;
     }
   },
+  directives: { Clickoutside },
   watch: {
     silderFrom: {
       handler(val) {
@@ -313,19 +306,17 @@ export default {
           }
         }
       },
-      deep: true
+      deep: true,
+      immediate: true
     },
     locale(newVal) {
       console.log(newVal);
-      // 重置
-      this.resizeClick();
       this.loading = true;
       this.getCountryList("change");
     }
   },
   mounted() {
     this.getCountryList();
-    this.getRankList();
   },
   components: {},
   methods: {
@@ -342,7 +333,18 @@ export default {
     },
     // 权重禁用切换
     changeDisabled(index) {
+      console.log(index);
       this.silderFrom[index].disabled = !this.silderFrom[index].disabled;
+    },
+    //regionChange
+    regionChange(params) {
+      if (params && params.length > 0) {
+        this.params.continent = params[0];
+        this.params.country = params[1];
+      } else {
+        this.params.continent = "";
+        this.params.country = "";
+      }
     },
     // 大洲选择清空
     continentSelectClear() {
@@ -361,6 +363,10 @@ export default {
       this.params.pageNow = 1;
       this.getRankList();
     },
+    // popOutClick
+    popOutClick() {
+      this.popShow = false;
+    },
     // 搜索按钮点击
     seachButtonClick() {
       this.params.pageNow = 1;
@@ -369,50 +375,13 @@ export default {
     },
     // 重置按钮
     resizeClick() {
-      this.silderFrom = [
-        {
-          weight: 30,
-          rweight: 0.3,
-          label: "声誉",
-          enlabel: "Reputation",
-          disabled: false
-        },
-        {
-          weight: 25,
-          rweight: 0.25,
-          label: "学术能力",
-          enlabel: "Academic Performance",
-          disabled: false
-        },
-        {
-          weight: 15,
-          rweight: 0.15,
-          label: "资金",
-          enlabel: "Endowment",
-          disabled: false
-        },
-        {
-          weight: 15,
-          rweight: 0.15,
-          label: "师资力量",
-          enlabel: "Faculty",
-          disabled: false
-        },
-        {
-          weight: 15,
-          rweight: 0.15,
-          label: "校友影响力",
-          enlabel: "Alumni",
-          disabled: false
-        }
-      ];
       this.params = {
         weight: {
-          Reputation: 0.3,
-          "Academic Performance": 0.25,
-          Endowment: 0.15,
-          Faculty: 0.15,
-          Alumni: 0.15
+          Reputation: 0,
+          "Academic Performance": 0,
+          Endowment: 0,
+          Faculty: 0,
+          Alumni: 0
         },
         continent: "",
         country: "",
@@ -421,11 +390,27 @@ export default {
         pageSize: 20,
         pageNow: 1
       };
+      this.region = [];
+      this.silderFrom[0].disabled = true;
+      for (let i = 0; i < this.silderFrom.length; i++) {
+        this.silderFrom[i].disabled = false;
+        this.silderFrom[i].weight = this.subjectList[0].parameters[
+          this.silderFrom[i].enlabel
+        ];
+      }
       this.getRankList();
     },
     // 大学名称点击跳转大学详情页
     nameClick(data) {
       console.log(data);
+      let routeData = this.$router.resolve({
+        path: "/info",
+        query: {
+          cnName: data.cnName,
+          enName: data.enName
+        }
+      });
+      window.open(routeData.href, "_blank");
     },
     // 请求国家列表
     getCountryList(isChange) {
@@ -438,6 +423,29 @@ export default {
             this.continentList = res.data.continentList;
             this.countryList = res.data.countryList;
             this.subjectList = res.data.subjectList;
+            this.regionList = [];
+            this.continentList.forEach(item => {
+              this.regionList.push({
+                value: item,
+                label: item,
+                children: []
+              });
+            });
+            this.countryList.forEach(item => {
+              for (let i = 0; i < this.regionList.length; i++) {
+                if (item.continent === this.regionList[i].label) {
+                  this.regionList[i].children.push({
+                    value: item.country_cn || item.country_en,
+                    label: item.country_cn || item.country_en
+                  });
+                  break;
+                } else {
+                  continue;
+                }
+              }
+            });
+            // 重置筛选
+            this.resizeClick();
           }
           if (isChange) {
             this.loading = false;
@@ -495,7 +503,6 @@ export default {
 
 <style lang="less">
 .page-container {
-  width: 1440px;
   height: 100%;
   margin: 0 auto;
   display: flex;
@@ -503,14 +510,62 @@ export default {
 }
 .homePage {
   min-height: calc(100% - 83px);
-  .tabBox {
-    background-color: rgb(255, 255, 255);
-    // border-bottom: 1px solid #ebeef5;
+  .homeCountBox {
+    padding-bottom: 50px;
+    flex-direction: column;
   }
-  .silderBox {
+  .topSelect {
     position: relative;
-    padding: 20px 0;
-    margin-left: 130px;
+    width: 700px;
+    padding-top: 20px;
+    margin: 0 auto;
+    line-height: 20px;
+    img {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .reginSelect,
+    .subjectSelect {
+      height: 20px;
+      padding: 0 10px;
+      flex: 1;
+    }
+  }
+  .selectBox {
+    .el-cascader--mini {
+      line-height: 20px;
+    }
+    .el-cascader,
+    .el-select {
+      width: 100%;
+    }
+    .el-input--mini {
+      .el-input__inner,
+      .el-input__icon {
+        height: 20px;
+        line-height: 20px;
+      }
+    }
+    .el-button--mini {
+      padding: 3px 15px;
+      background-color: #5167dc;
+      border-color: #5167dc;
+    }
+  }
+  .universitySearchBox {
+    width: 100%;
+    padding-top: 20px;
+  }
+  .popSliderBox {
+    position: absolute;
+    left: 0;
+    top: 50px;
+    padding: 10px 20px;
+    background: #fff;
+    border: 1px solid #5167dc;
+    z-index: 1000;
     .rweightSpan {
       position: relative;
     }
@@ -551,6 +606,12 @@ export default {
       margin: 12px 0;
       background-color: transparent;
       border: 1px solid #5167dc;
+      &.disabled {
+        border-color: #cccccc;
+      }
+      .el-slider__bar {
+        height: 4px;
+      }
     }
     .el-slider__button-wrapper {
       width: 30px;
@@ -576,67 +637,6 @@ export default {
       height: 0;
     }
   }
-  .rightInputBox {
-    display: flex;
-    width: 575px;
-    padding: 20px 0;
-    margin-left: auto;
-    padding-right: 115px;
-    flex-direction: column;
-    text-align: left;
-    p {
-      line-height: 20px;
-      padding-bottom: 6px;
-      color: #000;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .continentLabel {
-      width: 240px;
-      padding-right: 20px;
-    }
-    .countryLabel {
-      width: 220px;
-    }
-    .el-select {
-      width: 100%;
-    }
-    .continentSelectBox {
-      width: 240px;
-      margin-bottom: 14px;
-      padding-right: 20px;
-    }
-    .countrySelectBox {
-      width: 220px;
-      margin-bottom: 14px;
-    }
-    .buttonBox {
-      display: flex;
-      height: 30px;
-      margin-top: 20px;
-      justify-content: flex-end;
-      > button {
-        width: 100px;
-      }
-      .el-button--primary {
-        background-color: #5167dc;
-        border-color: #5167dc;
-        &.is-disabled {
-          background-color: #c0c4cc;
-          border-color: #c0c4cc;
-        }
-      }
-    }
-  }
-  .homeCountBox {
-    padding-bottom: 50px;
-    flex-direction: column;
-  }
-  .universitySearchBox {
-    width: 700px;
-    padding-top: 20px;
-    margin: 0 auto;
-  }
   .rankCunt {
     width: 700px;
     padding-top: 20px;
@@ -648,8 +648,8 @@ export default {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      // color: #5167dc;
-      // cursor: pointer;
+      color: #5167dc;
+      cursor: pointer;
     }
     .countryImg {
       width: 18px;
