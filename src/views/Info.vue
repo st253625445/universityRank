@@ -31,7 +31,7 @@
     </div>
     <div class="toolBox" v-show="!infoPageLoading && !noData">
       <div class="toolItem">
-        <div class="toolTitle">{{$t('infoPage.imagesTitle')}}</div>
+        <div class="toolTitle">{{ $t("infoPage.imagesTitle") }}</div>
         <div class="toolItemCount unviImages">
           <el-carousel height="200px" indicator-position="none">
             <el-carousel-item v-for="(item, index) in srcList" :key="index">
@@ -43,49 +43,33 @@
             class="moreImagesButton"
             @click="showImagePop"
           >
-            {{$t('infoPage.moreImage')}}
+            {{ $t("infoPage.moreImage") }}
           </el-button>
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
-        <div class="toolTitle">{{$t('infoPage.mapTitle')}}</div>
+        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
         <div class="toolItemCount toolMapBox">
-          <baidu-map
-            class="toolMapCount"
-            :class="{ toolMapCountPop: baiduMapPop }"
-            :center="coordinate"
-            :zoom="15"
-            :scroll-wheel-zoom="true"
-          >
-            <bm-marker :position="coordinate" :dragging="true"> </bm-marker>
-            <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
+          <baidu-map class="toolMapCount" @ready="map_handler" :zoom="map_zoom"
+            ><bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
           </baidu-map>
-          <!-- <i
-            class="el-icon-full-screen baiduMapPopShow"
-            @click="baiduMapPopShow"
-          ></i>
-          <i
-            class="el-icon-close baiduMapPopClose"
-            v-if="baiduMapPop"
-            @click="baiduMapPop = false"
-          ></i> -->
         </div>
       </div>
       <div class="toolItem" v-if="!isChinaUnvi">
-        <div class="toolTitle">{{$t('infoPage.mapTitle')}}</div>
+        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
         <div class="toolItemCount toolMapBox">
           <gmap-map
             class="toolMapCount"
-            :center="coordinate"
-            :zoom="15"
+            :center="map_center"
+            :zoom="map_zoom"
             :scroll-wheel-zoom="true"
           >
-            <gmap-marker :position="coordinate" :dragging="true"></gmap-marker>
+            <gmap-marker :position="map_center" :dragging="true"></gmap-marker>
           </gmap-map>
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
-        <div class="toolTitle">{{$t('infoPage.scoreTitle')}}</div>
+        <div class="toolTitle">{{ $t("infoPage.scoreTitle") }}</div>
         <div class="toolItemCount">
           <div class="topSelect">
             <el-select size="mini" v-model="scoreSelect.batch">
@@ -126,8 +110,11 @@
           </el-table>
         </div>
       </div>
-      <div class="toolItem" v-if="!isChinaUnvi && Object.keys(requireList).length>0" >
-        <div class="toolTitle">{{$t('infoPage.requireTitle')}}</div>
+      <div
+        class="toolItem"
+        v-if="!isChinaUnvi && Object.keys(requireList).length > 0"
+      >
+        <div class="toolTitle">{{ $t("infoPage.requireTitle") }}</div>
         <div class="toolItemCount requireBox">
           <ul>
             <li v-for="(value, key) in requireList" :key="key">
@@ -169,7 +156,7 @@ export default {
       hasMoreAbstract: false, // 简介是否有隐藏部分
       abstractShow: false, // 简介是否展开
       baiduMapPop: false,
-      coordinate: { lng: 0, lat: 0 },
+      map_center: { lng: 0, lat: 0 },
       srcList: [],
       scoreSelect: {
         region: "",
@@ -178,7 +165,8 @@ export default {
       },
       scoreList: {},
       requireList: {},
-      imagePopShow: false
+      imagePopShow: false,
+      map_zoom: 15
     };
   },
   computed: {
@@ -312,10 +300,10 @@ export default {
             this.isChinaUnvi = res.data.isChineseUnvi === "true";
             this.infoData = res.data.infobox;
             this.srcList = res.data.images || [];
-            this.coordinate.lng =
-              res.data.coordinate && res.data.coordinate.longitude;
-            this.coordinate.lat =
-              res.data.coordinate && res.data.coordinate.latitude;
+            this.map_center.lng =
+              res.data.map_center && res.data.map_center.longitude;
+            this.map_center.lat =
+              res.data.map_center && res.data.map_center.latitude;
             this.requireList = this.scoreList = res.data.score;
           } else {
             this.noData = true;
@@ -345,6 +333,15 @@ export default {
       this.$nextTick(() => {
         console.log(this);
       });
+    },
+    map_handler({ BMap, map }) {
+      this.map_zoom = 15;
+      map.centerAndZoom(new BMap.Point(116.404, 39.915), this.map_zoom);
+      map.enableScrollWheelZoom(true);
+      let local = new BMap.LocalSearch(map, {
+        renderOptions: { map: map }
+      });
+      local.search(this.$route.query.cnName);
     },
     subjectSelectClear() {},
     requireItemStyleFn(data) {
