@@ -21,6 +21,13 @@ const en = {
     universityName: "University",
     scoreText: "Score"
   },
+  infoPage: {
+    imagesTitle: "Photos",
+    mapTitle: "Map",
+    requireTitle: "Application Requirements",
+    scoreTitle: "Admission Score",
+    moreImage: "More"
+  },
   ...enLocale
 };
 

@@ -18,15 +18,20 @@
         <span class="more" v-if="hasMoreAbstract && !abstractShow">...</span>
       </div>
     </div>
-    <div class="infoBox" v-show="!abstractShow && !noData">
+    <div
+      class="infoBox"
+      v-show="!noData"
+      ref="infoBox"
+      :style="{ height: infoBoxHeight }"
+    >
       <div class="infoItem" v-for="(value, key) in infoData" :key="key">
         <span class="infiItemLabel">{{ key }}</span>
         <span class="infiItemContent" v-html="value"></span>
       </div>
     </div>
-    <div class="toolBox" v-show="!infoPageLoading && !abstractShow && !noData">
+    <div class="toolBox" v-show="!infoPageLoading && !noData">
       <div class="toolItem">
-        <div class="toolTitle">校园图集</div>
+        <div class="toolTitle">{{$t('infoPage.imagesTitle')}}</div>
         <div class="toolItemCount unviImages">
           <el-carousel height="200px" indicator-position="none">
             <el-carousel-item v-for="(item, index) in srcList" :key="index">
@@ -38,12 +43,12 @@
             class="moreImagesButton"
             @click="showImagePop"
           >
-            查看更多
+            {{$t('infoPage.moreImage')}}
           </el-button>
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
-        <div class="toolTitle">地图信息</div>
+        <div class="toolTitle">{{$t('infoPage.mapTitle')}}</div>
         <div class="toolItemCount toolMapBox">
           <baidu-map
             class="toolMapCount"
@@ -67,7 +72,7 @@
         </div>
       </div>
       <div class="toolItem" v-if="!isChinaUnvi">
-        <div class="toolTitle">地图信息</div>
+        <div class="toolTitle">{{$t('infoPage.mapTitle')}}</div>
         <div class="toolItemCount toolMapBox">
           <gmap-map
             class="toolMapCount"
@@ -80,7 +85,7 @@
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
-        <div class="toolTitle">录取分数线</div>
+        <div class="toolTitle">{{$t('infoPage.scoreTitle')}}</div>
         <div class="toolItemCount">
           <div class="topSelect">
             <el-select size="mini" v-model="scoreSelect.batch">
@@ -121,8 +126,8 @@
           </el-table>
         </div>
       </div>
-      <div class="toolItem" v-if="!isChinaUnvi">
-        <div class="toolTitle">申请要求</div>
+      <div class="toolItem" v-if="!isChinaUnvi && Object.keys(requireList).length>0" >
+        <div class="toolTitle">{{$t('infoPage.requireTitle')}}</div>
         <div class="toolItemCount requireBox">
           <ul>
             <li v-for="(value, key) in requireList" :key="key">
@@ -159,6 +164,7 @@ export default {
       image_sch: "",
       abstract: "",
       infoData: {},
+      infoBoxHeight: "auto",
       isChinaUnvi: true,
       hasMoreAbstract: false, // 简介是否有隐藏部分
       abstractShow: false, // 简介是否展开
@@ -269,7 +275,7 @@ export default {
         this.scoreSelect.batch = val[0];
       }
     },
-    abstract(val) {
+    abstract() {
       this.$nextTick(() => {
         let _DOM = this.$refs.abstract;
         let _scrollH = _DOM.scrollHeight;
@@ -295,6 +301,7 @@ export default {
         name: data.enName
       };
       this.noData = false;
+      this.infoBoxHeight = `auto`;
       getDetailBySch(_query)
         .then(res => {
           let _keys = Object.keys(res.data);
@@ -314,6 +321,8 @@ export default {
             this.noData = true;
           }
           this.$nextTick(() => {
+            let _height = this.$refs.infoBox.clientHeight;
+            this.infoBoxHeight = `${(Math.ceil(_height / 100) + 1) * 50}px`;
             this.infoPageLoading = false;
           });
         })
@@ -371,13 +380,17 @@ export default {
   margin: 0 auto;
   padding: 50px 0;
   text-align: left;
+  cursor: default;
   .titleBox {
+    position: relative;
     width: 100%;
+    height: 206px;
     display: flex;
     font-size: 12px;
     line-height: 18px;
     color: #101010;
     margin-bottom: 50px;
+    z-index: 50;
     .univLogoBox {
       width: 180px;
       margin-right: 75px;
@@ -400,9 +413,9 @@ export default {
         overflow: hidden;
         &.showOverflow {
           height: auto;
-          overflow: auto;
           background: #e6eaff;
           padding: 5px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
         }
       }
       .more {
@@ -414,21 +427,21 @@ export default {
     }
   }
   .infoBox {
-    width: 100%;
+    width: calc(100% + 10px);
+    position: relative;
     display: flex;
+    left: -5px;
+    flex-direction: column;
     flex-wrap: wrap;
     font-size: 12px;
     line-height: 24px;
     color: #101010;
     margin-bottom: 50px;
+    overflow: hidden;
     .infoItem {
       width: 50%;
       display: flex;
-      padding-right: 10px;
-      &:nth-child(2n) {
-        padding-left: 10px;
-        padding-right: 0;
-      }
+      padding: 0 5px;
     }
     .infiItemLabel {
       width: 140px;
@@ -597,7 +610,8 @@ export default {
           height: 100%;
           font-size: 14px;
           line-height: 36px;
-          width: 70px;
+          min-width: 70px;
+          padding-right: 10px;
           text-align: left;
         }
         .count {

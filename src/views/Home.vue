@@ -25,7 +25,7 @@
             clearable
           >
             <el-option
-              v-for="(item, index) in subjectList"
+              v-for="(item, index) in subjectListShow"
               :key="index"
               :label="item.value"
               :value="item.value"
@@ -281,6 +281,9 @@ export default {
         }
       }
       return _return;
+    },
+    subjectListShow: function(){
+      return this.subjectList.slice(1);
     }
   },
   directives: { Clickoutside },
@@ -534,6 +537,9 @@ export default {
     }
   }
   .selectBox {
+    span {
+      font-size: 12px;
+    }
     .el-cascader--mini {
       line-height: 20px;
     }

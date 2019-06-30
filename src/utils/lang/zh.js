@@ -21,6 +21,13 @@ const zh = {
     universityName: "大学",
     scoreText: "得分"
   },
+  infoPage: {
+    imagesTitle: "校园图集",
+    mapTitle: "地图信息",
+    requireTitle: "申请要求",
+    scoreTitle: "录取分数线",
+    moreImage: "查看更多"
+  },
   ...zhLocale
 };
 

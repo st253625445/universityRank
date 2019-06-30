@@ -42,13 +42,21 @@ export default {
   created() {
     this.selectValue =
       localStorage.lang == undefined ? "zh" : localStorage.lang;
+    document.title =
+      this.selectValue === "zh"
+        ? "2020年你可排世界大学排名"
+        : "NKP Global University Rankings 2020";
   },
   methods: {
     //语言切换
     langChange(e) {
-      // console.log(e)
+      // console.log(document);
       localStorage.setItem("lang", e);
       this.$i18n.locale = e;
+      document.title =
+        e === "zh"
+          ? "2020年你可排世界大学排名"
+          : "NKP Global University Rankings 2020";
     }
   }
 };
