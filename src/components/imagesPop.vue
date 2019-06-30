@@ -10,11 +10,15 @@
       </div>
       <div class="imgsList">
         <div
-          v-for="(url, index) in urls"
+          v-for="(item, index) in urls"
           :key="index"
-          @click="changeShowUrl(url)"
+          @click="changeShowUrl(item)"
         >
-          <el-image :src="url" lazy fit="contain"></el-image>
+          <el-image
+            :src="`${item.url}.${item.type}`"
+            lazy
+            fit="contain"
+          ></el-image>
         </div>
       </div>
     </div>
@@ -27,17 +31,8 @@ export default {
   data() {
     return {
       imgLoading: true,
-      showUrl:
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-      urls: [
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg2.jpeg",
-        "https://cube.elemecdn.com/6/94/4d3ea53c084bad6931a56d5158a48jpeg.jpeg"
-      ]
+      showUrl: "",
+      urls: []
     };
   },
   created() {
@@ -60,6 +55,8 @@ export default {
         .then(res => {
           console.log(res);
           this.imgLoading = false;
+          this.urls = res.data.data;
+          this.showUrl = this.urls[0];
         })
         .catch(rej => {
           console.log(rej);
@@ -72,7 +69,11 @@ export default {
     },
     changeShowUrl(data) {
       console.log(data);
-      this.showUrl = data;
+      if (data && data.url && data.type) {
+        this.showUrl = `${data.url}.${data.type}`;
+      } else {
+        this.showUrl = "";
+      }
     }
   }
 };

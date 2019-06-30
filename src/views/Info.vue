@@ -9,6 +9,7 @@
         <p
           class="content"
           :class="{ showOverflow: abstractShow }"
+          :style="abstractShowStyle"
           ref="abstract"
           @mouseenter="abstractShowFn(true)"
           @mouseleave="abstractShowFn(false)"
@@ -35,7 +36,7 @@
         <div class="toolItemCount unviImages">
           <el-carousel height="200px" indicator-position="none">
             <el-carousel-item v-for="(item, index) in srcList" :key="index">
-              <el-image :src="`${item.url}.${item.type}`" lazy> </el-image>
+              <el-image :src="`${item.url}`" :fit="contain" lazy> </el-image>
             </el-carousel-item>
           </el-carousel>
           <el-button
@@ -155,6 +156,7 @@ export default {
       isChinaUnvi: true,
       hasMoreAbstract: false, // 简介是否有隐藏部分
       abstractShow: false, // 简介是否展开
+      abstractShowStyle: {}, // 简介展开的样式
       baiduMapPop: false,
       map_center: { lng: 0, lat: 0 },
       srcList: [],
@@ -301,9 +303,9 @@ export default {
             this.infoData = res.data.infobox;
             this.srcList = res.data.images || [];
             this.map_center.lng =
-              res.data.map_center && res.data.map_center.longitude;
+              res.data.coordinate && res.data.coordinate.longitude;
             this.map_center.lat =
-              res.data.map_center && res.data.map_center.latitude;
+              res.data.coordinate && res.data.coordinate.latitude;
             this.requireList = this.scoreList = res.data.score;
           } else {
             this.noData = true;
@@ -325,6 +327,16 @@ export default {
     // 展开隐藏的简介内容
     abstractShowFn(data) {
       if (this.hasMoreAbstract) {
+        if (data) {
+          let _top = this.$refs.abstract.offsetTop;
+          this.abstractShowStyle = {
+            top: _top + "px"
+          };
+        } else {
+          this.abstractShowStyle = {
+            top: 0
+          };
+        }
         this.abstractShow = data;
       }
     },
@@ -336,14 +348,15 @@ export default {
     },
     map_handler({ BMap, map }) {
       this.map_zoom = 15;
-      map.centerAndZoom(new BMap.Point(116.404, 39.915), this.map_zoom);
-      map.enableScrollWheelZoom(true);
-      let local = new BMap.LocalSearch(map, {
-        renderOptions: { map: map }
-      });
-      local.search(this.$route.query.cnName);
+      if (this.isChinaUnvi) {
+        map.centerAndZoom(new BMap.Point(116.404, 39.915), this.map_zoom);
+        map.enableScrollWheelZoom(true);
+        let local = new BMap.LocalSearch(map, {
+          renderOptions: { map: map }
+        });
+        local.search(this.$route.query.cnName);
+      }
     },
-    subjectSelectClear() {},
     requireItemStyleFn(data) {
       let _right = ((data.all - data.end) / data.all) * 100 + "%";
       let _minW = ((data.end - data.start) / data.all) * 100 + "%";
@@ -397,8 +410,10 @@ export default {
       }
     }
     .univContent {
+      display: flex;
       position: relative;
       flex: 1;
+      flex-direction: column;
       .title {
         font-size: 28px;
         line-height: 40px;
@@ -406,9 +421,9 @@ export default {
       }
       .content {
         text-align: justify;
-        height: 126px;
         overflow: hidden;
         &.showOverflow {
+          position: absolute;
           height: auto;
           background: #e6eaff;
           padding: 5px;
@@ -497,6 +512,7 @@ export default {
       padding: 0 20px;
       background: #5167dc;
       transform: translate(-50%, 0);
+      border: none;
     }
     .toolMapCount {
       width: 100%;
