@@ -14,11 +14,7 @@
           :key="index"
           @click="changeShowUrl(item)"
         >
-          <el-image
-            :src="`${item.url}.${item.type}`"
-            lazy
-            fit="contain"
-          ></el-image>
+          <el-image :src="item.url" lazy fit="contain"></el-image>
         </div>
       </div>
     </div>
@@ -49,14 +45,13 @@ export default {
     getImages(data) {
       let _q = {
         language: this.$i18n.locale,
-        name: this.locale === "zh" ? data.cnName : data.enName
+        name: data.enName
       };
       getMoreImages(_q)
         .then(res => {
-          console.log(res);
           this.imgLoading = false;
-          this.urls = res.data.data;
-          this.showUrl = this.urls[0];
+          this.urls = res.data;
+          this.showUrl = this.urls[0].url;
         })
         .catch(rej => {
           console.log(rej);
@@ -70,7 +65,7 @@ export default {
     changeShowUrl(data) {
       console.log(data);
       if (data && data.url && data.type) {
-        this.showUrl = `${data.url}.${data.type}`;
+        this.showUrl = data.url;
       } else {
         this.showUrl = "";
       }

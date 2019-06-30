@@ -234,7 +234,8 @@ export default {
         name: "",
         pageSize: 20,
         pageNow: 1
-      }
+      },
+      requireParams: {}
     };
   },
   filters: {
@@ -282,7 +283,7 @@ export default {
       }
       return _return;
     },
-    subjectListShow: function(){
+    subjectListShow: function() {
       return this.subjectList.slice(1);
     }
   },
@@ -327,16 +328,16 @@ export default {
       return `${val}%`;
     },
     handleSizeChange(val) {
-      this.params.pageSize = val;
+      this.params.pageSize = this.requireParams.pageSize = val;
+      this.params.pageNow = this.requireParams.pageNow = 1;
       this.getRankList();
     },
     handleCurrentChange(val) {
-      this.params.pageNow = val;
+      this.params.pageNow = this.requireParams.pageNow = val;
       this.getRankList();
     },
     // 权重禁用切换
     changeDisabled(index) {
-      console.log(index);
       this.silderFrom[index].disabled = !this.silderFrom[index].disabled;
     },
     //regionChange
@@ -363,7 +364,7 @@ export default {
     },
     // 学校名称变化
     schoolInputChange() {
-      this.params.pageNow = 1;
+      this.params.pageNow = this.requireParams.pageNow = 1;
       this.getRankList();
     },
     // popOutClick
@@ -374,6 +375,7 @@ export default {
     seachButtonClick() {
       this.params.pageNow = 1;
       this.params.name = "";
+      this.requireParams = { ...{}, ...this.params };
       this.getRankList();
     },
     // 重置按钮
@@ -462,9 +464,12 @@ export default {
     },
     // 请求排行
     getRankList() {
+      if (JSON.stringify(this.requireParams) == "{}") {
+        this.requireParams = { ...{}, ...this.params };
+      }
       let _opt = {
         language: this.locale,
-        ...this.params
+        ...this.requireParams
       };
       let rankData = [];
       this.loading = true;

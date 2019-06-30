@@ -36,7 +36,7 @@
         <div class="toolItemCount unviImages">
           <el-carousel height="200px" indicator-position="none">
             <el-carousel-item v-for="(item, index) in srcList" :key="index">
-              <el-image :src="`${item.url}`" :fit="contain" lazy> </el-image>
+              <el-image :src="item.url" fit="contain"> </el-image>
             </el-carousel-item>
           </el-carousel>
           <el-button
@@ -311,8 +311,29 @@ export default {
             this.noData = true;
           }
           this.$nextTick(() => {
+            console.log(this.$refs);
             let _height = this.$refs.infoBox.clientHeight;
-            this.infoBoxHeight = `${(Math.ceil(_height / 100) + 1) * 50}px`;
+            let _childNodes = this.$refs.infoBox.childNodes;
+            let _childHeights = [];
+            _childNodes.forEach(item => {
+              _childHeights.push(item.clientHeight);
+            });
+            let defaultH = (_height - 0) / 2;
+            let boxH = 0;
+            for (let i = 0; i < _childHeights.length; i++) {
+              boxH += _childHeights[i] - 0;
+              if (boxH >= defaultH) {
+                let _leftH = boxH;
+                let _rightH = 0;
+                _childHeights.slice(i + 1).forEach(item => {
+                  _rightH += item;
+                });
+                this.infoBoxHeight = `${_leftH > _rightH ? _leftH : _rightH}px`;
+                break;
+              } else {
+                continue;
+              }
+            }
             this.infoPageLoading = false;
           });
         })

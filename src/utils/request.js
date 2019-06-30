@@ -42,11 +42,7 @@ service.interceptors.response.use(
     if (res.code === 200) {
       return response.data;
     } else {
-      Message({
-        message: res.msg,
-        type: "error",
-        duration: 5 * 1000
-      });
+      console.log(res.msg);
     }
   },
   error => {
