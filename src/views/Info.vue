@@ -185,9 +185,15 @@ export default {
       return _return;
     },
     subjectList: function() {
-      // let _score = this.scoreList;
-      // let _return = Object.keys(_score);
-      let _return = ["文科", "理科"];
+      let _score = this.scoreList;
+      let _subjects = Object.keys(_score);
+      let _return = [];
+      if (_subjects.indexOf("arts") !== -1) {
+        _return.push("文科");
+      }
+      if (_subjects.indexOf("science") !== -1) {
+        _return.push("理科");
+      }
       return _return;
     },
     batchList: function() {

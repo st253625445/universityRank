@@ -4,11 +4,12 @@
       class="imgCountBox"
       v-clickoutside="popOutClick"
       v-loading="imgLoading"
+      @mousewheel="listMousewheel"
     >
       <div class="imgCount">
         <el-image :src="showUrl" lazy fit="contain"></el-image>
       </div>
-      <div class="imgsList" @mousewheel="listMousewheel" ref="urlslist">
+      <div class="imgsList" ref="urlslist">
         <el-image
           v-for="(item, index) in urlsLazy"
           :key="index"
