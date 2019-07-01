@@ -48,12 +48,10 @@
           </el-button>
         </div>
       </div>
-      <div class="toolItem" v-if="isChinaUnvi">
+      <div class="toolItem" v-show="isChinaUnvi">
         <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
         <div class="toolItemCount toolMapBox">
-          <baidu-map class="toolMapCount" @ready="map_handler" :zoom="map_zoom"
-            ><bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
-          </baidu-map>
+          <baidu-map></baidu-map>
         </div>
       </div>
       <div class="toolItem" v-if="!isChinaUnvi">
@@ -142,6 +140,7 @@
 import { getDetailBySch } from "@/API/getData";
 
 import ImagesPop from "@/components/imagesPop";
+import BaiduMap from "@/components/baiduMap";
 export default {
   name: "info",
   data() {
@@ -276,7 +275,7 @@ export default {
       });
     }
   },
-  components: { ImagesPop },
+  components: { ImagesPop, BaiduMap },
   created() {
     let query = this.$route.query;
     if (query.cnName || query.enName) {
@@ -358,22 +357,6 @@ export default {
           };
         }
         this.abstractShow = data;
-      }
-    },
-    baiduMapPopShow() {
-      this.baiduMapPop = true;
-      this.$nextTick(() => {
-        console.log(this);
-      });
-    },
-    map_handler({ BMap, map }) {
-      if (this.isChinaUnvi) {
-        map.enableScrollWheelZoom(true);
-        let local = new BMap.LocalSearch(map, {
-          renderOptions: { map: map }
-        });
-        local.search(this.$route.query.cnName);
-        local.setPageCapacity(5);
       }
     },
     requireItemStyleFn(data) {
@@ -544,29 +527,6 @@ export default {
         height: calc(100%);
         z-index: 1050;
       }
-    }
-    .baiduMapPopShow {
-      position: absolute;
-      width: 40px;
-      height: 40px;
-      font-size: 24px;
-      line-height: 40px;
-      color: #fff;
-      right: 30px;
-      top: 30px;
-      background: rgba(78, 78, 78, 0.6);
-    }
-    .baiduMapPopClose {
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      font-size: 24px;
-      line-height: 40px;
-      color: #fff;
-      right: 30px;
-      top: 30px;
-      background: rgba(78, 78, 78, 0.6);
-      z-index: 1051;
     }
     .pano_close {
       top: auto;

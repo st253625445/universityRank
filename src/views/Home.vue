@@ -102,7 +102,7 @@
             </el-table-column>
             <el-table-column width="40">
               <template slot-scope="scope">
-                <div class="disabledIcon" @click="changeDisabled(scope.$index)">
+                <div class="disabledIcon" @click="changeDisabled(scope.row)">
                   <i class="el-icon-check" v-if="!scope.row.disabled"></i>
                   <i class="icon-disabled" v-else></i>
                 </div>
@@ -337,8 +337,16 @@ export default {
       this.getRankList();
     },
     // 权重禁用切换
-    changeDisabled(index) {
-      this.silderFrom[index].disabled = !this.silderFrom[index].disabled;
+    changeDisabled(data) {
+      let _enlabel = data.enlabel;
+      for (let i = 0; i < this.silderFrom.length; i++) {
+        if (_enlabel === this.silderFrom[i].enlabel) {
+          this.silderFrom[i].disabled = !this.silderFrom[i].disabled;
+          break;
+        } else {
+          continue;
+        }
+      }
     },
     //regionChange
     regionChange(params) {
@@ -404,7 +412,10 @@ export default {
           this.silderFrom[i].enlabel
         ];
       }
-      this.getRankList();
+      this.requireParams = {};
+      this.$nextTick(() => {
+        this.getRankList();
+      });
     },
     // 大学名称点击跳转大学详情页
     nameClick(data) {

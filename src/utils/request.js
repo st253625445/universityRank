@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Message } from "element-ui";
 
 // 创建axios实例
 const service = axios.create({
