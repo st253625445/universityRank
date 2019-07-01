@@ -311,7 +311,6 @@ export default {
             this.noData = true;
           }
           this.$nextTick(() => {
-            console.log(this.$refs);
             let _height = this.$refs.infoBox.clientHeight;
             let _childNodes = this.$refs.infoBox.childNodes;
             let _childHeights = [];
@@ -368,14 +367,13 @@ export default {
       });
     },
     map_handler({ BMap, map }) {
-      this.map_zoom = 15;
       if (this.isChinaUnvi) {
-        map.centerAndZoom(new BMap.Point(116.404, 39.915), this.map_zoom);
         map.enableScrollWheelZoom(true);
         let local = new BMap.LocalSearch(map, {
           renderOptions: { map: map }
         });
         local.search(this.$route.query.cnName);
+        local.setPageCapacity(5);
       }
     },
     requireItemStyleFn(data) {

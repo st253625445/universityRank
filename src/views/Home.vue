@@ -365,6 +365,7 @@ export default {
     // 学校名称变化
     schoolInputChange() {
       this.params.pageNow = this.requireParams.pageNow = 1;
+      this.requireParams.name = this.params.name;
       this.getRankList();
     },
     // popOutClick
@@ -475,33 +476,32 @@ export default {
       this.loading = true;
       getRankList(_opt)
         .then(res => {
-          if (res.code === 200) {
-            this.total = res.data.pageInfo.total;
-            for (let key in res.data.info) {
-              let _item = {
-                enName: key,
-                ...res.data.info[key]
-              };
-              rankData.push(_item);
-            }
-            rankData.sort((a, b) => {
-              let _xh1 = a.xh;
-              let _xh2 = b.xh;
-              if (_xh1 > _xh2) {
-                return 1;
-              } else if (_xh1 < _xh2) {
-                return -1;
-              } else {
-                return 0;
-              }
-            });
+          this.total = res.data.pageInfo.total;
+          for (let key in res.data.info) {
+            let _item = {
+              enName: key,
+              ...res.data.info[key]
+            };
+            rankData.push(_item);
           }
+          rankData.sort((a, b) => {
+            let _xh1 = a.xh;
+            let _xh2 = b.xh;
+            if (_xh1 > _xh2) {
+              return 1;
+            } else if (_xh1 < _xh2) {
+              return -1;
+            } else {
+              return 0;
+            }
+          });
           this.loading = false;
           this.rankData = rankData;
         })
         .catch(rej => {
           this.loading = false;
           console.log(rej);
+          this.total = 0;
           this.rankData = rankData;
         });
     }
