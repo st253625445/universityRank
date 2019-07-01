@@ -1,5 +1,9 @@
 <template>
-  <baidu-map class="toolMapCount" @ready="map_handler" :zoom="map_zoom">
+  <baidu-map
+    class="toolMapCount baiduMapBox"
+    @ready="map_handler"
+    :zoom="map_zoom"
+  >
     <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
   </baidu-map>
 </template>
@@ -29,3 +33,8 @@ export default {
   }
 };
 </script>
+<style lang="less">
+.baiduMapBox {
+  width: 348px;
+}
+</style>
