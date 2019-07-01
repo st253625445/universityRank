@@ -701,4 +701,7 @@ export default {
     text-align: center;
   }
 }
+.el-pagination {
+  font-weight: normal;
+}
 </style>

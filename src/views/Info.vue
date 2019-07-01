@@ -30,7 +30,7 @@
         <span class="infiItemContent" v-html="value"></span>
       </div>
     </div>
-    <div class="toolBox" v-show="!infoPageLoading && !noData">
+    <div class="toolBox">
       <div class="toolItem">
         <div class="toolTitle">{{ $t("infoPage.imagesTitle") }}</div>
         <div class="toolItemCount unviImages">
@@ -645,6 +645,9 @@ export default {
   .el-image {
     width: 100%;
     height: 100%;
+  }
+  .el-loading-mask {
+    background: rgba(255, 255, 255);
   }
 }
 </style>
