@@ -19,7 +19,8 @@ const zh = {
   indexPage: {
     tableIndex: "排名",
     universityName: "大学",
-    scoreText: "得分"
+    scoreText: "得分",
+    globalXhText: "世界"
   },
   infoPage: {
     imagesTitle: "校园图集",

@@ -45,7 +45,7 @@ export default {
     document.title =
       this.selectValue === "zh"
         ? "2020年你可排世界大学排名"
-        : "NKP Global University Rankings 2020";
+        : "2020 NKP Global University Rankings";
   },
   methods: {
     //语言切换

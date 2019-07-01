@@ -121,6 +121,13 @@
             width="80"
           >
           </el-table-column>
+          <el-table-column
+            prop="xh_g"
+            :label="$t('indexPage.globalXhText')"
+            width="80"
+            v-if="requireParams.country"
+          >
+          </el-table-column>
           <el-table-column :label="$t('indexPage.universityName')">
             <template slot-scope="scope">
               <p class="name" @click="nameClick(scope.row)">

@@ -19,7 +19,8 @@ const en = {
   indexPage: {
     tableIndex: "Rank",
     universityName: "University",
-    scoreText: "Score"
+    scoreText: "Score",
+    globalXhText: "Global"
   },
   infoPage: {
     imagesTitle: "Photos",
