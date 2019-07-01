@@ -21,7 +21,7 @@ export default {
       local.disableFirstResultSelection();
       local.setSearchCompleteCallback(res => {
         let _point = res.Ar[0].point;
-        setTimeout(() => {
+        this.$nextTick(() => {
           map.centerAndZoom(_point, 15);
         });
       });
