@@ -60,10 +60,10 @@ export default {
           this.imgLoading = false;
           this.urls = res.data;
           this.urlsLazy = new Array(res.data.length);
+          this.showUrl = this.urls[0].url;
           for (let i = 0; i < 10; i++) {
             this.urlsLazy[i] = this.urls[i].url;
           }
-          this.showUrl = this.urls[0].url;
         })
         .catch(rej => {
           console.log(rej);

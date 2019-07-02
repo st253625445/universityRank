@@ -48,7 +48,7 @@
           </el-button>
         </div>
       </div>
-      <div class="toolItem" v-show="isChinaUnvi">
+      <div class="toolItem" v-if="isChinaUnvi">
         <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
         <div class="toolItemCount toolMapBox">
           <baidu-map></baidu-map>
@@ -161,7 +161,7 @@ export default {
       srcList: [],
       scoreSelect: {
         region: "",
-        subject: "文科",
+        subject: "理科",
         batch: ""
       },
       scoreList: {},
@@ -188,11 +188,11 @@ export default {
       let _score = this.scoreList;
       let _subjects = Object.keys(_score);
       let _return = [];
-      if (_subjects.indexOf("arts") !== -1) {
-        _return.push("文科");
-      }
       if (_subjects.indexOf("science") !== -1) {
         _return.push("理科");
+      }
+      if (_subjects.indexOf("arts") !== -1) {
+        _return.push("文科");
       }
       return _return;
     },

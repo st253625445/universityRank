@@ -24,10 +24,12 @@ export default {
       local.setPageCapacity(5);
       local.disableFirstResultSelection();
       local.setSearchCompleteCallback(res => {
-        let _point = res.Ar[0].point;
-        this.$nextTick(() => {
-          map.centerAndZoom(_point, 15);
-        });
+        if (res.Ar.length) {
+          let _point = res.Ar[0].point;
+          this.$nextTick(() => {
+            map.centerAndZoom(_point, 15);
+          });
+        }
       });
     }
   }

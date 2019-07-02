@@ -125,7 +125,7 @@
             prop="xh_g"
             :label="$t('indexPage.globalXhText')"
             width="80"
-            v-if="requireParams.country"
+            v-if="requireParams.country || requireParams.continent"
           >
           </el-table-column>
           <el-table-column :label="$t('indexPage.universityName')">
