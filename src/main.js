@@ -21,7 +21,8 @@ Vue.use(VueGoogleMaps, {
     key: "AIzaSyAxhDDN-BJELdSTxptjRVQn6uY9x6l42f8",
     // v: "GOOGLE_MAPS_VERSION",
     libraries: "places"
-  }
+  },
+  loadCn: true
 });
 
 new Vue({

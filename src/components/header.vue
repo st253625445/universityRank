@@ -1,6 +1,9 @@
 <template>
   <header>
     <div class="app-header">
+      <div class="backHome" @click="backHome" v-if="$route.name !== 'home'">
+        {{ $t("message.backHome") }}
+      </div>
       <div class="logo">{{ $t("message.title") }}</div>
       <div class="headerNav">
         <el-select
@@ -57,6 +60,12 @@ export default {
         e === "zh"
           ? "2020年你可排世界大学排名"
           : "NKP Global University Rankings 2020";
+    },
+    // 返回首页
+    backHome() {
+      this.$router.push({
+        path: "/"
+      });
     }
   }
 };
@@ -80,9 +89,19 @@ header {
     color: rgb(255, 255, 255);
     line-height: 50px;
   }
+  .backHome {
+    position: absolute;
+    left: 50%;
+    margin-left: -400px;
+    font-size: 14px;
+    color: rgb(255, 255, 255);
+    line-height: 50px;
+    cursor: pointer;
+  }
   .headerNav {
     position: absolute;
-    right: 40px;
+    right: 50%;
+    margin-right: -400px;
     display: flex;
     font-size: 14px;
     color: rgb(255, 255, 255);

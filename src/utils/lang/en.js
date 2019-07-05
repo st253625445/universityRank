@@ -1,6 +1,7 @@
 import enLocale from "element-ui/lib/locale/lang/en"; //引入element语言包
 const en = {
   message: {
+    backHome: "Home",
     title: "NiKePai Global University Ranking",
     footerText: "Powered by WuZhen Institute"
   },
@@ -23,11 +24,20 @@ const en = {
     globalXhText: "Global"
   },
   infoPage: {
+    infoTitle: "Basic Info",
     imagesTitle: "Photos",
     mapTitle: "Map",
     requireTitle: "Application Requirements",
     scoreTitle: "Admission Score",
-    moreImage: "More"
+    moreImage: "More",
+    regionText: "Region",
+    globalText: "Global"
+  },
+  mobilePage: {
+    regionLabel: "Region",
+    subjectLabel: "Subject",
+    weightLabel: "Weights",
+    globalText: "Global"
   },
   ...enLocale
 };

@@ -32,3 +32,11 @@ export function getMoreImages(params) {
     data: params
   });
 }
+// 测试是否能访问google
+export function getGoogle(params) {
+  return request({
+    url: `https://www.google.com/`,
+    method: "get",
+    data: params
+  });
+}

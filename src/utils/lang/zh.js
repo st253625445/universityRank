@@ -1,6 +1,7 @@
 import zhLocale from "element-ui/lib/locale/lang/zh-CN"; //引入element语言包
 const zh = {
   message: {
+    backHome: "返回首页",
     title: "你可排 - 世界大学排名",
     footerText: "乌镇智库技术支持"
   },
@@ -23,11 +24,20 @@ const zh = {
     globalXhText: "世界"
   },
   infoPage: {
+    infoTitle: "基本信息",
     imagesTitle: "校园图集",
     mapTitle: "地图信息",
     requireTitle: "申请要求",
     scoreTitle: "录取分数线",
-    moreImage: "查看更多"
+    moreImage: "查看更多",
+    regionText: "地区排名",
+    globalText: "世界排名"
+  },
+  mobilePage: {
+    regionLabel: "地区",
+    subjectLabel: "学科",
+    weightLabel: "权重",
+    globalText: "全球"
   },
   ...zhLocale
 };

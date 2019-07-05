@@ -3,6 +3,10 @@
     <div class="titleBox">
       <div class="univLogoBox">
         <el-image class="img" :src="image_sch" lazy></el-image>
+        <div class="rankText">
+          {{ $t("infoPage.regionText") }}: {{ rankRegion }}
+          {{ $t("infoPage.globalText") }}: {{ rankGlobal }}
+        </div>
       </div>
       <div class="univContent">
         <p class="title">{{ name }}</p>
@@ -57,14 +61,7 @@
       <div class="toolItem" v-if="!isChinaUnvi">
         <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
         <div class="toolItemCount toolMapBox">
-          <gmap-map
-            class="toolMapCount"
-            :center="map_center"
-            :zoom="map_zoom"
-            :scroll-wheel-zoom="true"
-          >
-            <gmap-marker :position="map_center" :dragging="true"></gmap-marker>
-          </gmap-map>
+          <GoogleOrBingMap :center="map_center"></GoogleOrBingMap>
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
@@ -141,6 +138,7 @@ import { getDetailBySch } from "@/API/getData";
 
 import ImagesPop from "@/components/imagesPop";
 import BaiduMap from "@/components/baiduMap";
+import GoogleOrBingMap from "@/components/googleOrBingMap";
 export default {
   name: "info",
   data() {
@@ -151,6 +149,8 @@ export default {
       image_sch: "",
       abstract: "",
       infoData: {},
+      rankRegion: "",
+      rankGlobal: "",
       infoBoxHeight: "auto",
       isChinaUnvi: true,
       hasMoreAbstract: false, // 简介是否有隐藏部分
@@ -281,7 +281,7 @@ export default {
       });
     }
   },
-  components: { ImagesPop, BaiduMap },
+  components: { ImagesPop, BaiduMap, GoogleOrBingMap },
   created() {
     let query = this.$route.query;
     if (query.cnName || query.enName) {
@@ -307,6 +307,8 @@ export default {
             this.isChinaUnvi = res.data.isChineseUnvi === "true";
             this.infoData = res.data.infobox;
             this.srcList = res.data.images || [];
+            this.rankGlobal = res.data.rank_global;
+            this.rankRegion = res.data.rank_country;
             this.map_center.lng =
               res.data.coordinate && res.data.coordinate.longitude;
             this.map_center.lat =
@@ -415,6 +417,10 @@ export default {
       .img {
         width: 180px;
         height: 180px;
+      }
+      .rankText {
+        line-height: 30px;
+        text-align: center;
       }
     }
     .univContent {
