@@ -8,38 +8,35 @@
         {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}
       </div>
     </div>
-    <div class="baseInfoBox">
-      <ul class="baseInfo">
-        <li v-for="(item, key) in baseInfoData" :key="key">
-          <span class="infoLabel">{{ key }}</span>
-          <span class="infoValue">{{ item }}</span>
+    <div class="requireInfoBox">
+      <ul class="requireBox">
+        <li v-for="(item, key) in requireData" :key="key">
+          <span class="infoLabel">{{ item.name }}</span>
+          <span class="infoValue">{{ `${item.start}-${item.end}` }}</span>
         </li>
       </ul>
     </div>
-    <el-backtop target=".baseInfo"></el-backtop>
   </div>
 </template>
 <script>
 export default {
-  props: ["topInfoData", "baseInfoData"],
+  props: ["topInfoData", "requireData"],
   data() {
     return {};
   }
 };
 </script>
 <style lang="less">
-.baseInfoBox {
+.requireInfoBox {
   width: 100%;
   height: calc(100% - 25.0667vw);
   padding-top: 2.1333vw;
-  .baseInfo {
+  .requireBox {
     width: 100%;
-    height: 100%;
-    overflow: scroll;
+    overflow: auto;
     background: #fff;
     color: #000;
     padding: 0 4vw;
-    padding-bottom: 16vw;
     li {
       display: flex;
       min-height: 10.6667vw;
@@ -50,6 +47,7 @@ export default {
         width: 38.6667vw;
       }
       .infoValue {
+        text-align: right;
         flex: 1;
       }
       &:last-child {

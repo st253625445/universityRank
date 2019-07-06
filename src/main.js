@@ -5,6 +5,7 @@ import store from "./store";
 import ElementUI from "element-ui";
 import "normalize.css/normalize.css";
 import "element-ui/lib/theme-chalk/index.css";
+import "vant/lib/index.css";
 import "@/assets/less/index.less"; // global css
 import i18n from "./utils/i18n";
 import BaiduMap from "vue-baidu-map";

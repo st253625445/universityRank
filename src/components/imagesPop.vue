@@ -25,7 +25,6 @@
 <script>
 import Clickoutside from "element-ui/src/utils/clickoutside";
 import { getMoreImages } from "@/API/getData";
-import { clearTimeout, setTimeout } from "timers";
 export default {
   data() {
     return {

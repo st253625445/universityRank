@@ -37,7 +37,9 @@ const zh = {
     regionLabel: "地区",
     subjectLabel: "学科",
     weightLabel: "权重",
-    globalText: "全球"
+    globalText: "全球",
+    moreLoadText: "加载中...",
+    nomoreText: "暂无更多"
   },
   ...zhLocale
 };

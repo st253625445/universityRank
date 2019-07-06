@@ -37,7 +37,9 @@ const en = {
     regionLabel: "Region",
     subjectLabel: "Subject",
     weightLabel: "Weights",
-    globalText: "Global"
+    globalText: "Global",
+    moreLoadText: "Loading...",
+    nomoreText: "No More"
   },
   ...enLocale
 };

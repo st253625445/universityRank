@@ -56,6 +56,12 @@
             {{ item.score | numToFiexd }}
           </span>
         </li>
+        <li v-if="!listFinished" class="univItem nomore">
+          {{ $t("mobilePage.moreLoadText") }}
+        </li>
+        <li v-if="listFinished" class="univItem nomore">
+          {{ $t("mobilePage.nomoreText") }}
+        </li>
       </ul>
     </div>
     <transition name="slide-fade">
@@ -90,11 +96,11 @@ import { getCountryList, getRankList } from "@/API/getData";
 import MobileRegion from "@/components/mobileRegion";
 import MobileSubject from "@/components/mobileSubject";
 import MobileWeight from "@/components/mobileWeight";
-import { setTimeout } from "timers";
 export default {
   data() {
     return {
       loading: true,
+      listFinished: false,
       language: "",
       languageText: "English",
       region: "全球",
@@ -188,6 +194,9 @@ export default {
               return 0;
             }
           });
+          if (this.rankList.length >= res.data.pageInfo.total) {
+            this.listFinished = true;
+          }
           this.loading = false;
         })
         .catch(rej => {
@@ -222,6 +231,7 @@ export default {
         weight: _weight
       };
       this.rankList = [];
+      this.listFinished = false;
 
       if (params) {
         _params = {
@@ -250,6 +260,7 @@ export default {
         pageNow: 1
       };
       this.rankList = [];
+      this.listFinished = false;
       this.getRankList(_opt);
     },
     changeSubject(data) {
@@ -273,6 +284,7 @@ export default {
         pageNow: 1
       };
       this.rankList = [];
+      this.listFinished = false;
       this.getRankList(_opt);
     },
     changeWeight(data) {
@@ -282,11 +294,12 @@ export default {
         pageNow: 1
       };
       this.rankList = [];
+      this.listFinished = false;
       this.getRankList(_opt);
     },
     // 触底加载更多
     univsListScroll() {
-      if (this.scrollTimeOut || this.loading) return false;
+      if (this.scrollTimeOut || this.loading || this.listFinished) return false;
       this.scrollTimeOut = setTimeout(() => {
         this.scrollTimeOut = null;
         let _Dom = this.$refs.univsList;
@@ -297,9 +310,13 @@ export default {
       }, 1000);
     },
     linkToUniv(data) {
+      let _q = {
+        cnName: data.cnName,
+        enName: data.enName
+      };
       this.$router.push({
         name: "mobileInfo",
-        params: data
+        query: _q
       });
     }
   }
@@ -384,6 +401,10 @@ export default {
         display: flex;
         border-bottom: 0.2667vw solid #bbbbbb;
         align-items: center;
+        &.nomore {
+          justify-content: center;
+          border-bottom: none;
+        }
         .index,
         .gIndex,
         .scoreValue {

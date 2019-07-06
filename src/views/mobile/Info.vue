@@ -1,15 +1,15 @@
 <template>
-  <div class="mobileInfoPage">
+  <div class="mobileInfoPage" v-loading="infoPageLoading">
     <div class="infoHeader">
       <i class="el-icon-arrow-left backIcon" @click="backHomePage"></i>
-      <div class="univName">{{ univName }}</div>
+      <div class="univName">{{ topInfoData.univName }}</div>
     </div>
     <div class="infoTopBox">
-      <el-image class="img" :src="image_sch"></el-image>
-      <div class="univName">{{ univName }}</div>
+      <el-image class="img" :src="topInfoData.url"></el-image>
+      <div class="univName">{{ topInfoData.univName }}</div>
       <div class="rankText">
-        {{ $t("infoPage.regionText") }}: {{ rankRegion }}
-        {{ $t("infoPage.globalText") }}: {{ rankGlobal }}
+        {{ $t("infoPage.regionText") }}: {{ topInfoData.rankRegion }}
+        {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}
       </div>
     </div>
     <div class="abstractBox">
@@ -22,48 +22,105 @@
         <span class="label">{{ $t("infoPage.infoTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
-      <div class="moreInfoItem">
+      <div class="moreInfoItem" @click="imagesBoxShow = true">
         <span class="label">{{ $t("infoPage.imagesTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
-      <div class="moreInfoItem">
+      <div
+        class="moreInfoItem"
+        v-if="isChineseUnvi"
+        @click="scoreBoxShow = true"
+      >
         <span class="label">{{ $t("infoPage.scoreTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
-      <div class="moreInfoItem">
+      <div
+        class="moreInfoItem"
+        v-if="!isChineseUnvi"
+        @click="requireBoxShow = true"
+      >
         <span class="label">{{ $t("infoPage.requireTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
     </div>
     <transition name="slide-fade">
-      <BaseInfo v-show="baseBoxShow" :baseInfoData="baseInfoData"></BaseInfo>
+      <BaseInfo
+        v-show="baseBoxShow"
+        :topInfoData="topInfoData"
+        :baseInfoData="baseInfoData"
+      ></BaseInfo>
+    </transition>
+    <transition name="slide-fade">
+      <ImagesBox
+        v-show="imagesBoxShow"
+        :topInfoData="topInfoData"
+        :imagesData="imagesData"
+      ></ImagesBox>
+    </transition>
+    <transition name="slide-fade" v-if="isChineseUnvi">
+      <ScoreBox
+        v-show="scoreBoxShow"
+        :topInfoData="topInfoData"
+        :scoreData="scoreData"
+      ></ScoreBox>
+    </transition>
+    <transition name="slide-fade" v-if="!isChineseUnvi">
+      <RequireBox
+        v-show="requireBoxShow"
+        :topInfoData="topInfoData"
+        :requireData="requireData"
+      ></RequireBox>
     </transition>
   </div>
 </template>
 <script>
-import { getDetailBySch } from "@/API/getData";
+import { getDetailBySch, getMoreImages } from "@/API/getData";
 import BaseInfo from "@/components/mobileInfoBase";
+import ImagesBox from "@/components/mobileInfoImages";
+import ScoreBox from "@/components/mobileInfoScore";
+import RequireBox from "@/components/mobileInfoRequire";
 export default {
   data() {
     return {
-      univName: "",
+      infoPageLoading: true,
+      isChineseUnvi: true,
       abstract: "",
-      rankRegion: "-",
-      rankGlobal: "-",
-      image_sch: "",
+      topInfoData: {
+        url: "",
+        rankRegion: "-",
+        rankGlobal: "-",
+        univName: ""
+      },
       baseBoxShow: false,
-      baseInfoData: {}
+      baseInfoData: {},
+      imagesBoxShow: false,
+      imagesData: [],
+      scoreBoxShow: false,
+      scoreData: {},
+      requireBoxShow: false,
+      requireData: {}
     };
   },
-  components: { BaseInfo },
+  components: { BaseInfo, ImagesBox, ScoreBox, RequireBox },
   computed: {
     locale: function() {
       return this.$i18n.locale;
     }
   },
+  watch: {
+    imagesBoxShow(val) {
+      if (val) {
+        let params = this.$route.query;
+        if (params.enName) {
+          this.getImages(params);
+        }
+      }
+    }
+  },
   created() {
-    let params = this.$route.params;
-    this.univName = this.locale === "zh" ? params.cnName : params.enName;
+    let params = this.$route.query;
+    this.topInfoData.univName =
+      this.locale === "zh" ? params.cnName : params.enName;
     this.getUnivDetail(params);
   },
   methods: {
@@ -76,25 +133,58 @@ export default {
         .then(res => {
           console.log(res);
           let _data = res.data;
-          this.univName = _data.name;
           this.abstract = _data.abstract;
-          this.rankRegion = _data.rank_country;
-          this.rankGlobal = _data.rank_global;
-          this.image_sch = _data.image_sch;
           this.baseInfoData = _data.infobox;
+          this.topInfoData = {
+            url: _data.image_sch,
+            rankRegion: _data.rank_country,
+            rankGlobal: _data.rank_global,
+            univName: _data.name
+          };
+          this.isChineseUnvi = _data.isChineseUnvi === "true";
+          if (this.isChineseUnvi) {
+            this.scoreData = _data.score;
+            this.requireData = {};
+          } else {
+            this.requireData = _data.score;
+            this.scoreData = {};
+          }
+          this.infoPageLoading = false;
         })
         .catch(rej => {
           console.log(rej);
+          this.infoPageLoading = false;
         });
     },
     backHomePage() {
-      if (this.baseBoxShow) {
+      if (
+        this.baseBoxShow ||
+        this.imagesBoxShow ||
+        this.scoreBoxShow ||
+        this.requireBoxShow
+      ) {
         this.baseBoxShow = false;
+        this.imagesBoxShow = false;
+        this.scoreBoxShow = false;
+        this.requireBoxShow = false;
       } else {
         this.$router.push({
           name: "mobileHome"
         });
       }
+    },
+    getImages(data) {
+      let _q = {
+        language: this.$i18n.locale,
+        name: data.enName
+      };
+      getMoreImages(_q)
+        .then(res => {
+          this.imagesData = res.data;
+        })
+        .catch(rej => {
+          console.log(rej);
+        });
     }
   }
 };
@@ -149,7 +239,6 @@ export default {
     position: relative;
     padding: 4vw;
     height: 25.0667vw;
-    z-index: 100;
     background: #fff;
     .el-image {
       position: absolute;
@@ -228,8 +317,7 @@ export default {
     top: 0;
     left: 0;
     background: #f8f8f8;
-    padding-top: 35.7333vw;
-    overflow: auto;
+    padding-top: 10.6667vw;
   }
   .slide-fade-enter-active {
     transition: all 0.3s ease;
