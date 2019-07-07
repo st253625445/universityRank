@@ -1,5 +1,5 @@
 <template>
-  <div class="mobileHomePage" v-loading="loading">
+  <div class="mobileHomePage">
     <header>
       <div class="title">{{ $t("message.title") }}</div>
       <div class="languageText" @click="changeLanguage">{{ languageText }}</div>
@@ -21,7 +21,15 @@
         <i class="el-icon-arrow-right"></i>
       </div>
     </div>
-    <div class="listsBox">
+    <div class="searchSchool">
+      <el-input
+        :placeholder="$t('placeholder.schoolSearchText')"
+        v-model="params.name"
+        @input="schoolInputChange"
+        clearable
+      />
+    </div>
+    <div class="listsBox" v-loading="loading">
       <div class="listTh">
         <span class="index">{{ language === "zh" ? "排名" : "Rank" }}</span>
         <span class="gIndex" v-if="params.country || params.continent">
@@ -105,7 +113,7 @@ export default {
       languageText: "English",
       region: "全球",
       subject: "综合",
-      weight: "自定义",
+      weight: "默认",
       params: {
         continent: "",
         country: "",
@@ -140,12 +148,12 @@ export default {
       handler(nVal) {
         document.title =
           nVal === "zh"
-            ? "2020年你可排世界大学排名"
-            : "2020 NKP Global University Rankings";
+            ? "2020年由你排世界大学排名"
+            : "2020 UniRank Global University Rankings";
         this.languageText = nVal === "zh" ? "English" : "中文";
         this.region = nVal === "zh" ? "全球" : "Global";
-        this.subject = nVal === "zh" ? "综合" : "Comprehensive";
-        this.weight = nVal === "zh" ? "自定义" : "Default";
+        this.subject = nVal === "zh" ? "综合" : "Overall";
+        this.weight = nVal === "zh" ? "默认" : "Default";
         this.getCountryList();
       },
       immediate: true
@@ -278,6 +286,7 @@ export default {
         }
       }
       this.weightParams = _w;
+      this.weight = this.language === "zh" ? "默认" : "Default";
       let _opt = {
         subject: this.subjectList[data].value,
         weight: _w,
@@ -289,8 +298,17 @@ export default {
     },
     changeWeight(data) {
       this.weightShow = false;
+      this.weight = this.language === "zh" ? "自定义" : "Customized";
       let _opt = {
         weight: data,
+        pageNow: 1
+      };
+      this.rankList = [];
+      this.listFinished = false;
+      this.getRankList(_opt);
+    },
+    schoolInputChange() {
+      let _opt = {
         pageNow: 1
       };
       this.rankList = [];
@@ -347,7 +365,6 @@ export default {
     padding: 0 4vw;
     color: #000;
     background: #fff;
-    margin-bottom: 2.6667vw;
     .selectItem {
       display: flex;
       width: 100%;
@@ -369,11 +386,31 @@ export default {
       }
     }
   }
+  .searchSchool {
+    margin-top: 1.6vw;
+    width: 100%;
+    height: 8vw;
+    padding: 0 4vw;
+    line-height: 8vw;
+    border-radius: 2.1333vw;
+    .el-input__inner {
+      height: 8vw;
+      line-height: 8vw;
+    }
+    .el-input__clear {
+      font-size: 3.7333vw;
+    }
+    .el-input__icon {
+      width: 6.6667vw;
+      line-height: 8vw;
+    }
+  }
   .listsBox {
     display: flex;
     flex-direction: column;
     flex: 1;
     background: #fff;
+    margin-top: 1.6vw;
     .listTh {
       display: flex;
       width: 100%;
@@ -443,10 +480,14 @@ export default {
       display: flex;
       flex-wrap: wrap;
       .selectItem {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         width: 32%;
         margin-right: 2%;
         color: #101010;
-        line-height: 7.4667vw;
+        line-height: 4.8vw;
+        padding: 1.3333vw;
         text-align: center;
         border: 0.2667vw solid #bbb;
         margin-bottom: 2.1333vw;

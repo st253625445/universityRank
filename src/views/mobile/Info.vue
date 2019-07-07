@@ -5,17 +5,19 @@
       <div class="univName">{{ topInfoData.univName }}</div>
     </div>
     <div class="infoTopBox">
-      <el-image class="img" :src="topInfoData.url"></el-image>
+      <img :src="topInfoData.url" class="img" alt="" srcset="" />
       <div class="univName">{{ topInfoData.univName }}</div>
       <div class="rankText">
         {{ $t("infoPage.regionText") }}: {{ topInfoData.rankRegion }}
         {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}
       </div>
     </div>
-    <div class="abstractBox">
+    <div class="abstractBox" :class="{ open: abstractOpen }">
       <i class="hr"></i>
-      <p class="abstract">{{ abstract }}</p>
-      <i class="el-icon-d-caret"></i>
+      <p class="abstract" ref="abstractBox">{{ abstract }}</p>
+      <div class="openIcon" @click="changeAbstractBox" v-if="hasAbstractOpen">
+        <i class="el-icon-d-caret"></i>
+      </div>
     </div>
     <div class="moreInfoBox">
       <div class="moreInfoItem" @click="baseBoxShow = true">
@@ -54,6 +56,7 @@
       <ImagesBox
         v-show="imagesBoxShow"
         :topInfoData="topInfoData"
+        :imagesLoading="imagesLoading"
         :imagesData="imagesData"
       ></ImagesBox>
     </transition>
@@ -83,6 +86,7 @@ export default {
   data() {
     return {
       infoPageLoading: true,
+      imagesLoading: true,
       isChineseUnvi: true,
       abstract: "",
       topInfoData: {
@@ -98,7 +102,9 @@ export default {
       scoreBoxShow: false,
       scoreData: {},
       requireBoxShow: false,
-      requireData: {}
+      requireData: {},
+      abstractOpen: false,
+      hasAbstractOpen: false
     };
   },
   components: { BaseInfo, ImagesBox, ScoreBox, RequireBox },
@@ -131,7 +137,6 @@ export default {
       };
       getDetailBySch(_query)
         .then(res => {
-          console.log(res);
           let _data = res.data;
           this.abstract = _data.abstract;
           this.baseInfoData = _data.infobox;
@@ -150,6 +155,7 @@ export default {
             this.scoreData = {};
           }
           this.infoPageLoading = false;
+          this.setAbstractBox();
         })
         .catch(rej => {
           console.log(rej);
@@ -181,10 +187,22 @@ export default {
       getMoreImages(_q)
         .then(res => {
           this.imagesData = res.data;
+          this.imagesLoading = false;
         })
         .catch(rej => {
           console.log(rej);
         });
+    },
+    setAbstractBox() {
+      this.$nextTick(() => {
+        let _Dom = this.$refs.abstractBox;
+        if (_Dom.scrollHeight > _Dom.clientHeight) {
+          this.hasAbstractOpen = true;
+        }
+      });
+    },
+    changeAbstractBox() {
+      this.abstractOpen = !this.abstractOpen;
     }
   }
 };
@@ -194,7 +212,6 @@ export default {
   display: flex;
   flex-direction: column;
   width: 100vw;
-  height: 100vh;
   font-size: 3.4667vw;
   background: rgba(248, 248, 248, 1);
   padding-top: 10.6667vw;
@@ -240,7 +257,7 @@ export default {
     padding: 4vw;
     height: 25.0667vw;
     background: #fff;
-    .el-image {
+    .img {
       position: absolute;
       width: 17.0667vw;
       height: 17.0667vw;
@@ -265,27 +282,38 @@ export default {
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 0 4vw;
+    padding: 4vw;
     background: #fff;
     margin-bottom: 2.1333vw;
-    max-height: 50vh;
+    height: auto;
+    max-height: 74.6667vw;
     .hr {
+      position: absolute;
+      top: 0;
+      left: 4vw;
       height: 0.2667vw;
-      width: 100%;
+      width: 92vw;
       background: #bbbbbb;
     }
     p {
       flex: 1;
-      margin-top: 4vw;
-      margin-bottom: 10.6667vw;
       text-align: justify;
-      overflow: scroll;
+      overflow: hidden;
+      padding-bottom: 6.6667vw;
     }
-    .el-icon-d-caret {
+    .openIcon {
       position: absolute;
-      bottom: 5.3333vw;
-      left: 50%;
-      transform: translate(-50%;0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 10.6667vw;
+      background: #fff;
+    }
+    &.open {
+      max-height: none;
     }
   }
   .moreInfoBox {

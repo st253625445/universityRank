@@ -1,6 +1,8 @@
 <template>
   <div class="selectBox subjectSelectBox">
-    <p class="gloupLabel">综合排名</p>
+    <p class="gloupLabel">
+      {{ locale === "zh" ? "综合排名" : "Overall Ranking" }}
+    </p>
     <div class="selectGloup">
       <div
         class="selectItem"
@@ -10,7 +12,9 @@
         {{ subjectList[0] && subjectList[0].value }}
       </div>
     </div>
-    <p class="gloupLabel">学科分类</p>
+    <p class="gloupLabel">
+      {{ locale === "zh" ? "学科分类" : "Subject Rankings" }}
+    </p>
     <div class="selectGloup">
       <div
         class="selectItem"
@@ -31,6 +35,11 @@ export default {
     return {
       activeIndex: 0
     };
+  },
+  computed: {
+    locale: function() {
+      return this.$i18n.locale;
+    }
   },
   watch: {
     subjectList: {
