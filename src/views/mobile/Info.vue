@@ -103,7 +103,7 @@ export default {
       baseInfoData: {},
       hasImages: true,
       imagesBoxShow: false,
-      imagesData: [],
+      imagesData: {},
       scoreBoxShow: false,
       scoreData: {},
       requireBoxShow: false,

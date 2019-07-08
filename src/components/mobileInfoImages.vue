@@ -12,7 +12,7 @@
       <div class="imagesList" ref="imagesList">
         <div
           class="imageItem"
-          v-for="(item, index) in urls"
+          v-for="(item, index) in lowUrls"
           @click="showPopFn(item)"
           :style="styles[index]"
           :key="index"
@@ -44,13 +44,14 @@ export default {
     return {
       showPop: false,
       indexPop: 0,
+      lowUrls: [],
       urls: [],
       styles: []
     };
   },
   watch: {
     imagesData(val) {
-      if (val.length) {
+      if (Object.keys(val)) {
         this.setMasonry(val);
       }
     }
@@ -59,10 +60,14 @@ export default {
     setMasonry(data) {
       let _leftH = 0;
       let _rightH = 0;
+      this.lowUrls = [];
       this.urls = [];
       this.styles = [];
-      data.forEach(item => {
-        this.urls.push(item.url);
+      let _lowImages = data.w200 || [];
+      let _images = data.w500 || [];
+      _lowImages.forEach((item, index) => {
+        this.lowUrls.push(item.url);
+        this.urls.push(_images[index].url);
         let _h = item.height;
         let _w = item.width;
         let _b = _h / _w;
@@ -89,7 +94,7 @@ export default {
       this.indexPop = index;
     },
     showPopFn(data) {
-      let _index = this.urls.indexOf(data);
+      let _index = this.lowUrls.indexOf(data);
       this.showPop = true;
       this.indexPop = _index;
     }

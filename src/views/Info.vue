@@ -2,7 +2,7 @@
   <div class="infoPage" v-loading="infoPageLoading">
     <div class="titleBox">
       <div class="univLogoBox">
-        <el-image class="img" :src="image_sch" lazy></el-image>
+        <el-image class="img" :src="image_sch"></el-image>
         <div class="rankText">
           {{ $t("infoPage.regionText") }}: {{ rankRegion }}
           {{ $t("infoPage.globalText") }}: {{ rankGlobal }}

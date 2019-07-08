@@ -31,6 +31,7 @@ export default {
       imgLoading: true,
       showUrl: "",
       urls: [],
+      lowUrls: [],
       urlsLazy: [],
       activeIndex: 0,
       urlScrollTop: 0,
@@ -57,11 +58,13 @@ export default {
       getMoreImages(_q)
         .then(res => {
           this.imgLoading = false;
-          this.urls = res.data;
-          this.urlsLazy = new Array(res.data.length);
+          this.urls = res.data.w1000;
+          this.lowUrls = res.data.w200;
+          this.urlsLazy = new Array(this.urls.length);
           this.showUrl = this.urls[0].url;
-          for (let i = 0; i < 10; i++) {
-            this.urlsLazy[i] = this.urls[i].url;
+          let _len = this.lowUrls.length < 10 ? this.lowUrls.length : 10;
+          for (let i = 0; i < _len; i++) {
+            this.urlsLazy[i] = this.lowUrls[i].url;
           }
         })
         .catch(rej => {
@@ -79,9 +82,10 @@ export default {
       let _top = ListDom.childNodes[index].offsetTop - 120;
       this.urlScrollTop = _top;
       this.showUrl = this.urls[index].url;
-      let _len = index + 10 > this.urls.length ? this.urls.length : index + 10;
+      let _len =
+        index + 10 > this.lowUrls.length ? this.lowUrls.length : index + 10;
       for (let i = 0; i < _len; i++) {
-        this.urlsLazy[i] = this.urls[i].url;
+        this.urlsLazy[i] = this.lowUrls[i].url;
       }
       let _timer = this.timer;
       if (_timer) {
@@ -107,9 +111,9 @@ export default {
             ? _index > 0
               ? _index--
               : 0
-            : _index < this.urls.length - 1
+            : _index < this.lowUrls.length - 1
             ? _index++
-            : (_index = this.urls.length - 1);
+            : (_index = this.lowUrls.length - 1);
           this.changeShowUrl(_index);
         }, 300);
       }
