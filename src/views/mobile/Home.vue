@@ -31,7 +31,7 @@
           {{ language === "zh" ? "大学" : "University" }}
         </span>
         <span class="scoreLabel">
-          {{ language === "zh" ? "分数" : "score" }}
+          {{ language === "zh" ? "分数" : "Score" }}
         </span>
       </div>
       <ul class="univsList" ref="univsList" @scroll="univsListScroll">

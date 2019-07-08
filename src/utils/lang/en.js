@@ -2,7 +2,7 @@ import enLocale from "element-ui/lib/locale/lang/en"; //引入element语言包
 const en = {
   message: {
     backHome: "Home",
-    title: "NiKePai Global University Ranking",
+    title: "Unirank Global University Ranking",
     footerText: "Powered by WuZhen Institute"
   },
   placeholder: {

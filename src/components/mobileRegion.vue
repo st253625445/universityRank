@@ -1,6 +1,8 @@
 <template>
   <div class="selectBox regionSelectBox">
-    <p class="gloupLabel">全球排名</p>
+    <p class="gloupLabel">
+      {{ locale === "zh" ? "全球排名" : "Global Ranking" }}
+    </p>
     <div class="selectGloup">
       <div
         class="selectItem"
@@ -10,7 +12,7 @@
         {{ $t("mobilePage.globalText") }}
       </div>
     </div>
-    <p class="gloupLabel">热门地区</p>
+    <p class="gloupLabel">{{ locale === "zh" ? "热门地区" : "Hot Regions" }}</p>
     <div class="selectGloup">
       <div
         class="selectItem"
@@ -22,7 +24,9 @@
         {{ item }}
       </div>
     </div>
-    <p class="gloupLabel">按洲查找</p>
+    <p class="gloupLabel">
+      {{ locale === "zh" ? "按洲查找" : "Search by Region" }}
+    </p>
     <el-collapse accordion>
       <el-collapse-item
         v-for="(item, index) in regionList"

@@ -45,6 +45,7 @@
     </div>
     <transition name="slide-fade">
       <BaseInfo
+        v-if="Object.keys(baseInfoData).length > 0"
         v-show="baseBoxShow"
         :topInfoData="topInfoData"
         :baseInfoData="baseInfoData"
