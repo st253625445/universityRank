@@ -8,7 +8,7 @@
         {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}
       </div>
     </div>
-    <div class="imagesInfoBox">
+    <div class="imagesInfoBox" v-loading="imagesLoading">
       <div class="imagesList" ref="imagesList">
         <div
           class="imageItem"
@@ -39,7 +39,7 @@ import { ImagePreview } from "vant";
 Vue.use(ImagePreview);
 
 export default {
-  props: ["topInfoData", "imagesData"],
+  props: ["imagesLoading", "topInfoData", "imagesData"],
   data() {
     return {
       showPop: false,

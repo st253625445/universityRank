@@ -21,19 +21,28 @@
         </span>
         <span class="weight">{{ item.weight }}</span>
         <div class="weightChangeBox">
-          <i class="el-icon-minus" @click="changeWeightValue(index, 1)"></i>
-          <span class="weightValue">{{ item.value }}</span>
-          <i class="el-icon-plus" @click="changeWeightValue(index, 2)"></i>
+          <van-stepper
+            v-model="item.value"
+            step="5"
+            min="0"
+            max="100"
+            @change="changeWeightValue"
+          />
         </div>
       </el-row>
     </el-row>
     <el-row class="buttonBox">
-      <el-button type="primary" @click="resizeWeight">重置</el-button>
-      <el-button type="primary" @click="returnWeight">确认</el-button>
+      <el-button type="primary" @click="resizeWeight">{{
+        $t("placeholder.resetText")
+      }}</el-button>
+      <el-button type="primary" @click="returnWeight">{{
+        $t("placeholder.ConfirmText")
+      }}</el-button>
     </el-row>
   </div>
 </template>
 <script>
+import { Stepper } from "vant";
 export default {
   props: ["weightParams"],
   data() {
@@ -72,6 +81,7 @@ export default {
       ]
     };
   },
+  components: { [Stepper.name]: Stepper },
   computed: {
     locale: function() {
       return this.$i18n.locale;
@@ -104,15 +114,7 @@ export default {
       this.setDefaultWeightData();
     },
     // type:1为减 2为加
-    changeWeightValue(index, type) {
-      let _value = this.weightData[index].value;
-      if (type === 1 && _value > 0) {
-        _value -= 5;
-      }
-      if (type === 2 && _value < 100) {
-        _value += 5;
-      }
-      this.weightData[index].value = _value;
+    changeWeightValue() {
       this.changeWeight();
     },
     // value 改变计算weight
@@ -179,15 +181,18 @@ export default {
   .weightChangeBox {
     display: flex;
     width: 26.6667vw;
-    .weightValue {
-      width: 5vw;
+    .van-stepper {
+      button {
+        background-color: #fff;
+      }
     }
-    .el-icon-minus,
-    .el-icon-plus {
-      display: flex;
-      flex: 1;
-      align-items: center;
-      justify-content: center;
+    .van-stepper__input {
+      background: #fff;
+      font-size: 3.7333vw;
+      line-height: 10.6667vw;
+      width: 8.5333vw;
+      height: 100%;
+      margin: 0 0.5333vw;
     }
   }
 }

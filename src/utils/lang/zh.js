@@ -2,7 +2,7 @@ import zhLocale from "element-ui/lib/locale/lang/zh-CN"; //引入element语言�
 const zh = {
   message: {
     backHome: "返回首页",
-    title: "你可排 - 世界大学排名",
+    title: "由你排 - 世界大学排名",
     footerText: "乌镇智库技术支持"
   },
   placeholder: {
