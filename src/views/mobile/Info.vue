@@ -20,17 +20,21 @@
       </div>
     </div>
     <div class="moreInfoBox">
-      <div class="moreInfoItem" @click="baseBoxShow = true">
+      <div
+        class="moreInfoItem"
+        @click="baseBoxShow = true"
+        v-if="Object.keys(baseInfoData).length > 0"
+      >
         <span class="label">{{ $t("infoPage.infoTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
-      <div class="moreInfoItem" @click="imagesBoxShow = true">
+      <div class="moreInfoItem" @click="getMoreImages" v-if="hasImages">
         <span class="label">{{ $t("infoPage.imagesTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
       <div
         class="moreInfoItem"
-        v-if="isChineseUnvi"
+        v-if="isChineseUnvi && Object.keys(scoreData).length > 0"
         @click="scoreBoxShow = true"
       >
         <span class="label">{{ $t("infoPage.scoreTitle") }}</span>
@@ -38,7 +42,7 @@
       </div>
       <div
         class="moreInfoItem"
-        v-if="!isChineseUnvi"
+        v-if="!isChineseUnvi && Object.keys(requireData).length > 0"
         @click="requireBoxShow = true"
       >
         <span class="label">{{ $t("infoPage.requireTitle") }}</span>
@@ -47,7 +51,6 @@
     </div>
     <transition name="slide-fade">
       <BaseInfo
-        v-if="Object.keys(baseInfoData).length > 0"
         v-show="baseBoxShow"
         :topInfoData="topInfoData"
         :baseInfoData="baseInfoData"
@@ -98,6 +101,7 @@ export default {
       },
       baseBoxShow: false,
       baseInfoData: {},
+      hasImages: true,
       imagesBoxShow: false,
       imagesData: [],
       scoreBoxShow: false,
@@ -112,16 +116,6 @@ export default {
   computed: {
     locale: function() {
       return this.$i18n.locale;
-    }
-  },
-  watch: {
-    imagesBoxShow(val) {
-      if (val) {
-        let params = this.$route.query;
-        if (params.enName) {
-          this.getImages(params);
-        }
-      }
     }
   },
   created() {
@@ -147,6 +141,7 @@ export default {
             rankGlobal: _data.rank_global,
             univName: _data.name
           };
+          this.hasImages = _data.images.length > 0;
           this.isChineseUnvi = _data.isChineseUnvi === "true";
           if (this.isChineseUnvi) {
             this.scoreData = _data.score;
@@ -180,19 +175,23 @@ export default {
         });
       }
     },
-    getImages(data) {
+    getMoreImages() {
+      this.imagesBoxShow = true;
+      this.imagesLoading = true;
       let _q = {
         language: this.$i18n.locale,
-        name: data.enName
+        name: this.$route.query.enName
       };
-      getMoreImages(_q)
-        .then(res => {
-          this.imagesData = res.data;
-          this.imagesLoading = false;
-        })
-        .catch(rej => {
-          console.log(rej);
-        });
+      this.$nextTick(() => {
+        getMoreImages(_q)
+          .then(res => {
+            this.imagesData = res.data;
+            this.imagesLoading = false;
+          })
+          .catch(rej => {
+            console.log(rej);
+          });
+      });
     },
     setAbstractBox() {
       this.$nextTick(() => {
