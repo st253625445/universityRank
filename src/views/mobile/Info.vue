@@ -16,7 +16,7 @@
       <i class="hr"></i>
       <p class="abstract" ref="abstractBox">{{ abstract }}</p>
       <div class="openIcon" @click="changeAbstractBox" v-if="hasAbstractOpen">
-        <i class="el-icon-d-caret"></i>
+        <img src="@/assets/img/updown.svg" alt="" />
       </div>
     </div>
     <div class="moreInfoBox">
@@ -311,6 +311,10 @@ export default {
       width: 100%;
       height: 10.6667vw;
       background: #fff;
+      img {
+        width: 4vw;
+        height: 4vw;
+      }
     }
     &.open {
       max-height: none;
