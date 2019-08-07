@@ -3,6 +3,14 @@
     <div class="infoTopBox">
       <el-image class="img" :src="topInfoData.url"></el-image>
       <div class="univName">{{ topInfoData.univName }}</div>
+      <div class="icons">
+        <el-image
+          v-for="(item, index) in topInfoData.iconData"
+          :key="index"
+          :src="item.url"
+          fit="contain"
+        />
+      </div>
       <div class="rankText">
         {{ $t("infoPage.regionText") }}: {{ topInfoData.rankRegion }}
         {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}

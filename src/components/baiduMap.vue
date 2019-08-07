@@ -14,6 +14,7 @@ export default {
       map_zoom: 15
     };
   },
+  created() {},
   methods: {
     map_handler({ BMap, map }) {
       map.enableScrollWheelZoom(true);

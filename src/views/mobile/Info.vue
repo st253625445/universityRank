@@ -7,6 +7,14 @@
     <div class="infoTopBox">
       <img :src="topInfoData.url" class="img" alt="" srcset="" />
       <div class="univName">{{ topInfoData.univName }}</div>
+      <div class="icons">
+        <el-image
+          v-for="(item, index) in topInfoData.iconData"
+          :key="index"
+          :src="item.url"
+          fit="contain"
+        />
+      </div>
       <div class="rankText">
         {{ $t("infoPage.regionText") }}: {{ topInfoData.rankRegion }}
         {{ $t("infoPage.globalText") }}: {{ topInfoData.rankGlobal }}
@@ -48,6 +56,14 @@
         <span class="label">{{ $t("infoPage.requireTitle") }}</span>
         <i class="el-icon-arrow-right"></i>
       </div>
+      <div
+        class="moreInfoItem"
+        v-if="hasSecurityData"
+        @click="securityBoxShow = true"
+      >
+        <span class="label">{{ $t("infoPage.securityTitle") }}</span>
+        <i class="el-icon-arrow-right"></i>
+      </div>
     </div>
     <transition name="slide-fade">
       <BaseInfo
@@ -78,6 +94,13 @@
         :requireData="requireData"
       ></RequireBox>
     </transition>
+    <transition name="slide-fade" v-if="hasSecurityData">
+      <SecurityBox
+        v-show="securityBoxShow"
+        :topInfoData="topInfoData"
+        :securityData="securityData"
+      ></SecurityBox>
+    </transition>
   </div>
 </template>
 <script>
@@ -86,6 +109,7 @@ import BaseInfo from "@/components/mobileInfoBase";
 import ImagesBox from "@/components/mobileInfoImages";
 import ScoreBox from "@/components/mobileInfoScore";
 import RequireBox from "@/components/mobileInfoRequire";
+import SecurityBox from "@/components/mobileInfoSecurity";
 export default {
   data() {
     return {
@@ -97,7 +121,8 @@ export default {
         url: "",
         rankRegion: "-",
         rankGlobal: "-",
-        univName: ""
+        univName: "",
+        iconData: []
       },
       baseBoxShow: false,
       baseInfoData: {},
@@ -109,10 +134,13 @@ export default {
       requireBoxShow: false,
       requireData: {},
       abstractOpen: false,
-      hasAbstractOpen: false
+      hasAbstractOpen: false,
+      securityBoxShow: false,
+      hasSecurityData: false,
+      securityData: {}
     };
   },
-  components: { BaseInfo, ImagesBox, ScoreBox, RequireBox },
+  components: { BaseInfo, ImagesBox, ScoreBox, RequireBox, SecurityBox },
   computed: {
     locale: function() {
       return this.$i18n.locale;
@@ -150,6 +178,22 @@ export default {
             this.requireData = _data.score;
             this.scoreData = {};
           }
+          // 大学认证标签
+          this.topInfoData.iconData = [];
+          res.data.tags.forEach(item => {
+            this.topInfoData.iconData.push({
+              url: require(`../../assets/img/icon/${item.label}.png`),
+              value: item.value
+            });
+          });
+          // 校园安全
+          if (
+            res.data.campus_security &&
+            Object.keys(res.data.campus_security).length
+          ) {
+            this.hasSecurityData = true;
+            this.securityData = res.data.campus_security;
+          }
           this.infoPageLoading = false;
           this.setAbstractBox();
         })
@@ -163,12 +207,14 @@ export default {
         this.baseBoxShow ||
         this.imagesBoxShow ||
         this.scoreBoxShow ||
-        this.requireBoxShow
+        this.requireBoxShow ||
+        this.securityBoxShow
       ) {
         this.baseBoxShow = false;
         this.imagesBoxShow = false;
         this.scoreBoxShow = false;
         this.requireBoxShow = false;
+        this.securityBoxShow = false;
       } else {
         this.$router.push({
           name: "mobileHome"
@@ -271,11 +317,21 @@ export default {
       right: 4vw;
       top: 4vw;
     }
+    .icons {
+      position: absolute;
+      width: 66.6667vw;
+      right: 4vw;
+      bottom: 3vw;
+      display: flex;
+      .el-image {
+        width: 5vw;
+      }
+    }
     .rankText {
       position: absolute;
       width: 66.6667vw;
       right: 4vw;
-      bottom: 4vw;
+      bottom: 9vw;
     }
   }
   .abstractBox {

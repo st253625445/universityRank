@@ -29,6 +29,7 @@ const zh = {
     mapTitle: "地图信息",
     requireTitle: "申请要求",
     scoreTitle: "录取分数线",
+    securityTitle: "校园安全",
     moreImage: "查看更多",
     regionText: "地区排名",
     globalText: "世界排名"

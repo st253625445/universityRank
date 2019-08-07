@@ -4,34 +4,22 @@
       <el-row class="selectBox" type="flex">
         <img src="../assets/img/huakuai.svg" alt="" @click="popShow = true" />
         <span>{{ $t("placeholder.countrySearchTitle") }}</span>
-        <div class="reginSelect">
-          <el-cascader
-            v-model="region"
-            size="mini"
-            :placeholder="$t('placeholder.continentSearchText')"
-            :options="regionList"
-            @change="regionChange"
-            clearable
-          >
-          </el-cascader>
+        <div class="regionInput">
+          <span @click="popRegionShow = true">
+            {{ region }}
+          </span>
         </div>
         <span>{{ $t("placeholder.subjectSearchTitle") }}</span>
         <div class="subjectSelect">
-          <el-select
-            v-model="params.subject"
+          <el-cascader
+            v-model="subjectSelect"
+            :options="subjectListShow"
             size="mini"
             :placeholder="$t('placeholder.subjectSearchText')"
+            :show-all-levels="false"
             @clear="subjectSelectClear"
             clearable
-          >
-            <el-option
-              v-for="(item, index) in subjectListShow"
-              :key="index"
-              :label="item.value"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
+          ></el-cascader>
         </div>
         <el-button type="primary" @click="resizeClick" size="mini">{{
           $t("placeholder.resetText")
@@ -111,6 +99,19 @@
           </el-table>
         </div>
       </transition>
+      <transition name="el-zoom-in-top">
+        <div
+          class="popRegionBox"
+          v-show="popRegionShow"
+          v-clickoutside="popRegionOutClick"
+        >
+          <MobileRegion
+            :continentList="continentList"
+            :countryList="countryList"
+            @changeRegion="changeRegion"
+          />
+        </div>
+      </transition>
     </div>
     <div class="page-container homeCountBox">
       <div class="rankCunt" v-loading="loading">
@@ -167,6 +168,7 @@
 <script>
 import Clickoutside from "element-ui/src/utils/clickoutside";
 import { getCountryList, getRankList } from "@/API/getData";
+import MobileRegion from "@/components/mobileRegion";
 
 export default {
   name: "home",
@@ -174,6 +176,7 @@ export default {
     return {
       loading: true,
       popShow: false,
+      popRegionShow: false,
       continentList: [],
       countryList: [],
       regionList: [],
@@ -226,7 +229,7 @@ export default {
         "Alumni"
       ],
       language: "zh",
-      region: [],
+      region: "",
       params: {
         weight: {
           Reputation: 0,
@@ -242,6 +245,7 @@ export default {
         pageSize: 20,
         pageNow: 1
       },
+      subjectSelect: [],
       requireParams: {}
     };
   },
@@ -258,7 +262,7 @@ export default {
       return this.$i18n.locale;
     },
     silderFromShow: function() {
-      let _subject = this.params.subject;
+      let _subject = this.subjectSelect;
       let _return = [];
       let _fn = data => {
         for (let i = 0; i < this.silderFrom.length; i++) {
@@ -275,9 +279,9 @@ export default {
           }
         }
       };
-      if (_subject) {
-        let _parameters = this.subjectList.filter(item => {
-          return item.value === _subject;
+      if (_subject.length) {
+        let _parameters = this.subjectList[1][_subject[0]].filter(item => {
+          return item.value === _subject[1];
         })[0].parameters;
         _fn(_parameters);
       } else {
@@ -291,7 +295,21 @@ export default {
       return _return;
     },
     subjectListShow: function() {
-      return this.subjectList.slice(1);
+      let _data = this.subjectList[1];
+      let _return = [];
+      for (let key in _data) {
+        _return.push({
+          value: key,
+          label: key,
+          children: _data[key]
+        });
+      }
+      for (let item of _return) {
+        for (let item2 of item.children) {
+          item2["label"] = item2.value;
+        }
+      }
+      return _return;
     }
   },
   directives: { Clickoutside },
@@ -320,16 +338,31 @@ export default {
       deep: true,
       immediate: true
     },
+    subjectSelect: {
+      handler(val) {
+        if (val.length) {
+          this.params.subject = val[1];
+        } else {
+          this.params.subject = "";
+        }
+      }
+    },
     locale(newVal) {
       console.log(newVal);
+      this.region = this.locale === "zh" ? "所有" : "All";
       this.loading = true;
       this.getCountryList("change");
     }
   },
   mounted() {
+    this.region = this.locale
+      ? this.locale === "zh"
+        ? "所有"
+        : "All"
+      : "所有";
     this.getCountryList();
   },
-  components: {},
+  components: { MobileRegion },
   methods: {
     formatTooltip(val) {
       return `${val}%`;
@@ -356,14 +389,16 @@ export default {
       }
     },
     //regionChange
-    regionChange(params) {
-      if (params && params.length > 0) {
-        this.params.continent = params[0];
-        this.params.country = params[1];
+    changeRegion(data) {
+      this.popRegionShow = false;
+      this.region = data;
+      let _all = ["全球", "Global"];
+      if (data) {
+        this.params.country = _all.indexOf(data) !== -1 ? "" : data;
       } else {
-        this.params.continent = "";
         this.params.country = "";
       }
+      this.params.continent = "";
     },
     // 大洲选择清空
     continentSelectClear() {
@@ -375,7 +410,7 @@ export default {
     },
     // 学科选择清空
     subjectSelectClear() {
-      this.params.subject = "";
+      this.subjectSelect = [];
     },
     // 学校名称变化
     schoolInputChange() {
@@ -386,6 +421,9 @@ export default {
     // popOutClick
     popOutClick() {
       this.popShow = false;
+    },
+    popRegionOutClick() {
+      this.popRegionShow = false;
     },
     // 搜索按钮点击
     seachButtonClick() {
@@ -411,7 +449,8 @@ export default {
         pageSize: 20,
         pageNow: 1
       };
-      this.region = [];
+      this.subjectSelect = [];
+      this.region = this.locale === "zh" ? "所有" : "All";
       this.silderFrom[0].disabled = true;
       for (let i = 0; i < this.silderFrom.length; i++) {
         this.silderFrom[i].disabled = false;
@@ -468,6 +507,10 @@ export default {
                 }
               }
             });
+            // 记录是否是国内IP
+            if (res.data.ischinese) {
+              localStorage.setItem("ischinese", res.data.ischinese);
+            }
             // 重置筛选
             this.resizeClick();
           }
@@ -552,21 +595,36 @@ export default {
       margin-right: 10px;
       cursor: pointer;
     }
-    .reginSelect,
+    .regionSelect,
     .subjectSelect {
       height: 20px;
       padding: 0 10px;
       flex: 1;
+    }
+    .el-cascader--mini {
+      width: 100%;
+      line-height: 20px;
     }
   }
   .selectBox {
     span {
       font-size: 12px;
     }
-    .el-cascader--mini {
-      line-height: 20px;
+    .regionInput {
+      width: 240px;
+      font-size: 12px;
+      padding: 0 10px;
+      > span {
+        width: 100%;
+        height: 20px;
+        display: inline-block;
+        line-height: 18px;
+        padding: 0 15px;
+        text-align: left;
+        border-radius: 4px;
+        border: 1px solid #dcdfe6;
+      }
     }
-    .el-cascader,
     .el-select {
       width: 100%;
     }
@@ -664,6 +722,52 @@ export default {
     }
     .el-table::before {
       height: 0;
+    }
+  }
+  .popRegionBox {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 50px;
+    padding: 10px 20px;
+    background: #fff;
+    border: 1px solid #5167dc;
+    z-index: 1000;
+    .regionSelectBox {
+      p {
+        text-align: left;
+        font-size: 12px;
+        color: #888888;
+      }
+    }
+    .selectGloup {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .selectItem {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 90px;
+      margin-right: 6px;
+      color: #101010;
+      line-height: 20px;
+      text-align: center;
+      border: 1px solid #bbb;
+      margin-bottom: 6px;
+      font-size: 12px;
+      line-height: 18px;
+      cursor: pointer;
+      &.active {
+        border-color: #5167dc;
+        background-color: #5167dc;
+        color: #fff;
+      }
+    }
+    .el-collapse-item__header {
+      height: 30px;
+      line-height: 30px;
     }
   }
   .rankCunt {

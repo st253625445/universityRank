@@ -273,22 +273,20 @@ export default {
     },
     changeSubject(data) {
       this.subjectShow = false;
-      this.subject = this.subjectList[data].value;
+      this.subject = data.value;
       let _w = { ...this.params.weight };
-      if (this.subjectList[data]) {
-        let _parameters = this.subjectList[data].parameters;
-        for (let key in _w) {
-          if (_parameters[key]) {
-            _w[key] = _parameters[key] / 100;
-          } else {
-            _w[key] = 0;
-          }
+      let _parameters = data.parameters;
+      for (let key in _w) {
+        if (_parameters[key]) {
+          _w[key] = _parameters[key] / 100;
+        } else {
+          _w[key] = 0;
         }
       }
       this.weightParams = _w;
       this.weight = this.language === "zh" ? "默认" : "Default";
       let _opt = {
-        subject: this.subjectList[data].value,
+        subject: data.value,
         weight: _w,
         pageNow: 1
       };

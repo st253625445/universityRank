@@ -1,31 +1,39 @@
 <template>
   <div class="selectBox subjectSelectBox">
-    <p class="gloupLabel">
-      {{ locale === "zh" ? "综合排名" : "Overall Ranking" }}
-    </p>
-    <div class="selectGloup">
-      <div
-        class="selectItem"
-        :class="{ active: activeIndex === 0 }"
-        @click="changeSubject(0)"
-      >
-        {{ subjectList[0] && subjectList[0].value }}
+    <template v-if="subjectList[0]">
+      <p class="gloupLabel">
+        {{ subjectList[0].value }}
+      </p>
+      <div class="selectGloup">
+        <div
+          class="selectItem"
+          :class="{
+            active: !activeSelect || activeSelect === subjectList[0].value
+          }"
+          @click="changeSubject(subjectList[0])"
+        >
+          {{ subjectList[0].value }}
+        </div>
       </div>
-    </div>
-    <p class="gloupLabel">
-      {{ locale === "zh" ? "学科分类" : "Subject Rankings" }}
-    </p>
-    <div class="selectGloup">
-      <div
-        class="selectItem"
-        v-for="(item, index) in subjectList.slice(1)"
-        :key="index"
-        :class="{ active: activeIndex === index + 1 }"
-        @click="changeSubject(index + 1)"
-      >
-        {{ item && item.value }}
+    </template>
+    <template v-if="subjectList[1]">
+      <div v-for="(item, key) in subjectList[1]" :key="key">
+        <p class="gloupLabel">
+          {{ key }}
+        </p>
+        <div class="selectGloup">
+          <div
+            class="selectItem"
+            v-for="(item, index) in item"
+            :key="index"
+            :class="{ active: activeSelect === item.value }"
+            @click="changeSubject(item)"
+          >
+            {{ item && item.value }}
+          </div>
+        </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 <script>
@@ -33,7 +41,7 @@ export default {
   props: ["subjectList"],
   data() {
     return {
-      activeIndex: 0
+      activeSelect: ""
     };
   },
   computed: {
@@ -45,13 +53,13 @@ export default {
     subjectList: {
       handler(nVal) {
         console.log(nVal);
-        this.activeIndex = 0;
+        this.activeSelect = "";
       }
     }
   },
   methods: {
     changeSubject(data) {
-      this.activeIndex = data;
+      this.activeSelect = data.value;
       this.$nextTick(() => {
         this.$emit("changeSubject", data);
       });

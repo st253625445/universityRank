@@ -10,6 +10,12 @@
       </div>
       <div class="univContent">
         <p class="title">{{ name }}</p>
+        <div class="icon">
+          <div class="iconItem" v-for="(item, index) in iconData" :key="index">
+            <div class="tooltip">{{ item.value }}</div>
+            <el-image :src="item.url" fit="contain" />
+          </div>
+        </div>
         <p
           class="content"
           :class="{ showOverflow: abstractShow }"
@@ -125,6 +131,45 @@
           </ul>
         </div>
       </div>
+      <div class="toolItem">
+        <div class="toolTitle">{{ $t("infoPage.securityTitle") }}</div>
+        <div class="toolItemCount securityBox">
+          <div class="topSelect">
+            <el-select size="mini" v-model="securitySelect">
+              <el-option
+                v-for="(item, index) in securityOption"
+                :key="index"
+                :label="item"
+                :value="item"
+              >
+              </el-option>
+            </el-select>
+          </div>
+          <div class="securityCount">
+            <div>
+              <div
+                v-for="(item, index) in securityDataSelect"
+                :key="index"
+                class="securityItem"
+              >
+                <span class="securityLabel">{{ item.label }}</span>
+              </div>
+            </div>
+            <div>
+              <div
+                v-for="(item, index) in securityDataSelect"
+                :key="index"
+                class="securityItem"
+              >
+                <span class="securityBar">
+                  <span :style="{ width: item.per }"></span>
+                </span>
+                <span class="securityValue">{{ item.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <template v-if="imagePopShow">
       <ImagesPop @hidePop="hideImagePop"></ImagesPop>
@@ -139,6 +184,9 @@ import { getDetailBySch } from "@/API/getData";
 import ImagesPop from "@/components/imagesPop";
 import BaiduMap from "@/components/baiduMap";
 import GoogleOrBingMap from "@/components/googleOrBingMap";
+import Vue from "vue";
+import * as VueGoogleMaps from "vue2-google-maps";
+import VueBaiduMap from "vue-baidu-map";
 export default {
   name: "info",
   data() {
@@ -159,6 +207,7 @@ export default {
       baiduMapPop: false,
       map_center: { lng: 0, lat: 0 },
       srcList: [],
+      iconData: [], // 认证标签
       scoreSelect: {
         region: "",
         subject: "理科",
@@ -167,7 +216,10 @@ export default {
       scoreList: {},
       requireList: {},
       imagePopShow: false,
-      map_zoom: 15
+      map_zoom: 15,
+      securityOption: [],
+      securitySelect: "",
+      securityData: {}
     };
   },
   computed: {
@@ -228,6 +280,28 @@ export default {
       return function(value) {
         return this.requireItemValueFn(value);
       };
+    },
+    securityDataSelect() {
+      let _data = this.securityData[this.securitySelect];
+      let _return = [];
+      let maxVal = 0;
+      if (_data) {
+        // 设置柱子宽
+        for (let key in _data) {
+          if (_data[key] > maxVal) {
+            maxVal = _data[key];
+          }
+        }
+        // 生成返回数组
+        for (let key in _data) {
+          _return.push({
+            label: key,
+            value: _data[key],
+            per: `${((_data[key] - 0) / maxVal) * 100}%`
+          });
+        }
+      }
+      return _return;
     }
   },
   watch: {
@@ -287,6 +361,20 @@ export default {
     if (query.cnName || query.enName) {
       this.getDetailBySch(query);
     }
+    // 地图组件
+    let isChinese = localStorage.getItem("ischinese") === "0";
+    Vue.use(VueBaiduMap, {
+      // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
+      ak: "W8G1VEhRLFbgcE2GUABhWZka"
+    });
+    Vue.use(VueGoogleMaps, {
+      load: {
+        key: "AIzaSyAxhDDN-BJELdSTxptjRVQn6uY9x6l42f8",
+        // v: "GOOGLE_MAPS_VERSION",
+        libraries: "places"
+      },
+      loadCn: isChinese
+    });
   },
   methods: {
     // 请求大学信息
@@ -304,16 +392,38 @@ export default {
             this.name = res.data.name;
             this.abstract = res.data.abstract;
             this.image_sch = res.data.image_sch;
+            // 判断是否是中国大学
             this.isChinaUnvi = res.data.isChineseUnvi === "true";
+            // 大学信息
             this.infoData = res.data.infobox;
+            // 校园图集
             this.srcList = res.data.images || [];
+            // 排名信息
             this.rankGlobal = res.data.rank_global;
             this.rankRegion = res.data.rank_country;
+            // 经纬度
             this.map_center.lng =
               res.data.coordinate && res.data.coordinate.longitude;
             this.map_center.lat =
               res.data.coordinate && res.data.coordinate.latitude;
+            // 大学申请要求
             this.requireList = this.scoreList = res.data.score;
+            // 大学认证标签
+            this.iconData = [];
+            res.data.tags.forEach(item => {
+              this.iconData.push({
+                url: require(`../assets/img/icon/${item.label}.png`),
+                value: item.value
+              });
+            });
+            // 校园安全
+            if (res.data.campus_security) {
+              this.securityOption = Object.keys(res.data.campus_security).sort(
+                (a, b) => b - a
+              );
+              this.securitySelect = this.securityOption[0];
+              this.securityData = res.data.campus_security;
+            }
           } else {
             this.noData = true;
           }
@@ -431,7 +541,31 @@ export default {
       .title {
         font-size: 28px;
         line-height: 40px;
-        margin-bottom: 40px;
+        margin-bottom: 47px;
+      }
+      .icon {
+        display: flex;
+      }
+      .iconItem {
+        height: 30px;
+        .el-image {
+          width: 24px;
+          height: 24px;
+        }
+        .tooltip {
+          display: none;
+          position: absolute;
+          left: 0;
+          bottom: 120px;
+          background: #e6eaff;
+          padding: 5px;
+          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+        }
+        &:hover {
+          .tooltip {
+            display: block;
+          }
+        }
       }
       .content {
         text-align: justify;
@@ -643,6 +777,49 @@ export default {
           color: #fff;
           font-size: 12px;
           line-height: 28px;
+        }
+      }
+    }
+    .securityBox {
+      display: flex;
+      flex-direction: column;
+      .topSelect {
+        flex-direction: row;
+      }
+      .securityCount {
+        width: 100%;
+        padding-top: 10px;
+        flex: 1;
+        display: flex;
+        > div {
+          display: flex;
+          flex-direction: column;
+          &:last-child {
+            flex: 1;
+          }
+        }
+      }
+      .securityItem {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        .securityLabel {
+          max-width: 120px;
+          text-align: left;
+          word-break: break-all;
+        }
+        .securityValue {
+          width: 30px;
+        }
+        .securityBar {
+          flex: 1;
+          height: 12px;
+          padding: 0 20px;
+          > span {
+            display: block;
+            background: #5066dc;
+            height: 100%;
+          }
         }
       }
     }

@@ -29,6 +29,7 @@ const en = {
     mapTitle: "Map",
     requireTitle: "Application Requirements",
     scoreTitle: "Admission Score",
+    securityTitle: "Campus Security",
     moreImage: "More",
     regionText: "Region",
     globalText: "Global"
