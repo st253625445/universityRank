@@ -6,20 +6,7 @@
       </div>
       <div class="logo">{{ $t("message.title") }}</div>
       <div class="headerNav">
-        <el-select
-          v-model="selectValue"
-          size="mini"
-          @change="langChange"
-          placeholder="请选择"
-        >
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          >
-          </el-option
-        ></el-select>
+        <span @click="langChange">{{ languageText }}</span>
       </div>
     </div>
   </header>
@@ -29,37 +16,32 @@
 export default {
   data() {
     return {
-      selectValue: "",
-      options: [
-        {
-          value: "zh",
-          label: "中文"
-        },
-        {
-          value: "en",
-          label: "English"
-        }
-      ]
+      languageText: "English",
+      language: "zh"
     };
   },
   created() {
-    this.selectValue =
-      localStorage.lang == undefined ? "zh" : localStorage.lang;
-    document.title =
-      this.selectValue === "zh"
-        ? "2020年由你排世界大学排名"
-        : "2020 UniRank Global University Rankings";
+    this.language = localStorage.lang == undefined ? "zh" : localStorage.lang;
+  },
+  watch: {
+    language: {
+      handler(nVal) {
+        document.title =
+          nVal === "zh"
+            ? "2020年由你排世界大学排名"
+            : "2020 UniRank Global University Rankings";
+        this.languageText = nVal === "zh" ? "English" : "中文";
+      },
+      immediate: true
+    }
   },
   methods: {
     //语言切换
-    langChange(e) {
-      // console.log(document);
-      localStorage.setItem("lang", e);
-      this.$i18n.locale = e;
-      document.title =
-        e === "zh"
-          ? "2020年由你排世界大学排名"
-          : "UniRank Global University Rankings 2020";
+    langChange() {
+      let _lan = this.language === "zh" ? "en" : "zh";
+      localStorage.setItem("lang", _lan);
+      this.$i18n.locale = _lan;
+      this.language = _lan;
     },
     // 返回首页
     backHome() {
@@ -106,19 +88,8 @@ header {
     font-size: 14px;
     color: rgb(255, 255, 255);
     line-height: 50px;
-    ul {
-      display: flex;
-    }
-    li {
-      padding: 0 20px;
+    span {
       cursor: pointer;
-    }
-    .el-select {
-      width: 90px;
-    }
-    .el-input__inner {
-      background: transparent;
-      color: #fff;
     }
   }
 }
