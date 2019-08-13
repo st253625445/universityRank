@@ -1,29 +1,44 @@
 <template>
   <div class="infoPage" v-loading="infoPageLoading">
     <div class="titleBox">
-      <div class="univLogoBox">
+      <div class="univTitleBox">
         <el-image class="img" :src="image_sch"></el-image>
-        <div class="rankText">
-          {{ $t("infoPage.regionText") }}: {{ rankRegion }}
-          {{ $t("infoPage.globalText") }}: {{ rankGlobal }}
-        </div>
-      </div>
-      <div class="univContent">
-        <p class="title">{{ name }}</p>
-        <div class="icon">
-          <div class="iconItem" v-for="(item, index) in iconData" :key="index">
-            <div class="tooltip">{{ item.value }}</div>
-            <el-image :src="item.url" fit="contain" />
+        <div class="topInfoBox">
+          <p class="title">{{ name }}</p>
+          <div class="icon">
+            <div
+              class="iconItem"
+              v-for="(item, index) in iconData"
+              :key="index"
+            >
+              <div class="tooltip">{{ item.value }}</div>
+              <el-image :src="item.url" fit="contain" />
+            </div>
+            <div class="urlItem">
+              <span>官方网站</span>
+            </div>
           </div>
         </div>
-        <p
-          class="content"
-          :class="{ showOverflow: abstractShow }"
-          :style="abstractShowStyle"
-          ref="abstract"
-          @mouseenter="abstractShowFn(true)"
-          @mouseleave="abstractShowFn(false)"
-        >
+        <div class="rankText">
+          <div class="rankItem">
+            <span class="value">{{ rankRegion }}</span>
+            <span class="label">{{ $t("infoPage.regionText2") }}</span>
+          </div>
+          <div class="rankItem">
+            <span class="value">{{ rankGlobal }}</span>
+            <span class="label">{{ $t("infoPage.globalText2") }}</span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="univContent"
+        @mouseenter="abstractShowFn(true)"
+        @mouseleave="abstractShowFn(false)"
+      >
+        <p class="content" ref="abstract">
+          {{ abstract }}
+        </p>
+        <p class="contentShow" v-if="abstractShow" :style="abstractShowStyle">
           {{ abstract }}
         </p>
         <span class="more" v-if="hasMoreAbstract && !abstractShow">...</span>
@@ -506,7 +521,7 @@ export default {
 <style lang="less">
 .infoPage {
   min-height: calc(100% - 83px);
-  width: 800px;
+  width: 1140px;
   margin: 0 auto;
   padding: 50px 0;
   text-align: left;
@@ -514,49 +529,53 @@ export default {
   .titleBox {
     position: relative;
     width: 100%;
-    height: 206px;
+    max-height: 330px;
     display: flex;
+    flex-direction: column;
     font-size: 12px;
     line-height: 18px;
     color: #101010;
     margin-bottom: 50px;
     z-index: 50;
-    .univLogoBox {
-      width: 180px;
-      margin-right: 75px;
-      .img {
-        width: 180px;
-        height: 180px;
-      }
-      .rankText {
-        line-height: 30px;
-        text-align: center;
-      }
-    }
-    .univContent {
+    .univTitleBox {
       display: flex;
-      position: relative;
-      flex: 1;
-      flex-direction: column;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      padding: 20px 0;
+      .img {
+        width: 120px;
+        height: 120px;
+        margin-right: 35px;
+      }
+      .topInfoBox {
+        position: relative;
+        flex: 1;
+        height: 120px;
+      }
       .title {
+        position: absolute;
+        top: 0;
+        left: 0;
         font-size: 28px;
         line-height: 40px;
-        margin-bottom: 47px;
       }
       .icon {
-        display: flex;
+        margin-top: 87px;
       }
       .iconItem {
         height: 30px;
+        float: left;
         .el-image {
-          width: 24px;
-          height: 24px;
+          width: 32px;
+          height: 32px;
+          margin-right: 13px;
         }
         .tooltip {
           display: none;
           position: absolute;
+          bottom: 35px;
           left: 0;
-          bottom: 120px;
           background: #e6eaff;
           padding: 5px;
           box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
@@ -567,16 +586,56 @@ export default {
           }
         }
       }
+      .urlItem {
+        float: right;
+        span {
+          font-size: 14px;
+          color: #5066dc;
+          line-height: 30px;
+        }
+      }
+      .rankText {
+        display: flex;
+        flex-direction: row-reverse;
+        .rankItem {
+          display: flex;
+          flex-direction: column;
+          margin-left: 60px;
+          justify-content: center;
+          .value {
+            font-size: 36px;
+            line-height: 54px;
+            color: #5066dc;
+            padding: 0 15px;
+            border-bottom: 1px solid #5066dc;
+          }
+          .label {
+            color: #888888;
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+          }
+          &:last-child {
+            margin-left: 100px;
+          }
+        }
+      }
+    }
+    .univContent {
+      position: relative;
+      padding-top: 15px;
       .content {
         text-align: justify;
+        max-height: 160px;
         overflow: hidden;
-        &.showOverflow {
-          position: absolute;
-          height: auto;
-          background: #e6eaff;
-          padding: 5px;
-          box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
-        }
+      }
+      .contentShow {
+        position: absolute;
+        height: auto;
+        text-align: justify;
+        background: #e6eaff;
+        padding: 5px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       }
       .more {
         position: absolute;

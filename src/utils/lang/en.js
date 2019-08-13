@@ -32,7 +32,9 @@ const en = {
     securityTitle: "Campus Security",
     moreImage: "More",
     regionText: "Region",
-    globalText: "Global"
+    regionText2: "Region",
+    globalText: "Global",
+    globalText2: "Global"
   },
   mobilePage: {
     regionLabel: "Region",

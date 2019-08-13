@@ -74,7 +74,7 @@ header {
   .backHome {
     position: absolute;
     left: 50%;
-    margin-left: -400px;
+    margin-left: -570px;
     font-size: 14px;
     color: rgb(255, 255, 255);
     line-height: 50px;
@@ -83,7 +83,7 @@ header {
   .headerNav {
     position: absolute;
     right: 50%;
-    margin-right: -400px;
+    margin-right: -570px;
     display: flex;
     font-size: 14px;
     color: rgb(255, 255, 255);

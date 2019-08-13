@@ -32,7 +32,9 @@ const zh = {
     securityTitle: "校园安全",
     moreImage: "查看更多",
     regionText: "地区排名",
-    globalText: "世界排名"
+    regionText2: "地区",
+    globalText: "世界排名",
+    globalText2: "世界"
   },
   mobilePage: {
     regionLabel: "地区",
