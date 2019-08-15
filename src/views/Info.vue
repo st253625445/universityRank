@@ -56,6 +56,18 @@
       </div>
     </div>
     <div class="toolBox">
+      <div class="toolItem" v-if="isChinaUnvi">
+        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
+        <div class="toolItemCount toolMapBox">
+          <baidu-map></baidu-map>
+        </div>
+      </div>
+      <div class="toolItem" v-if="!isChinaUnvi">
+        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
+        <div class="toolItemCount toolMapBox">
+          <GoogleOrBingMap :center="map_center"></GoogleOrBingMap>
+        </div>
+      </div>
       <div class="toolItem">
         <div class="toolTitle">{{ $t("infoPage.imagesTitle") }}</div>
         <div class="toolItemCount unviImages">
@@ -71,18 +83,6 @@
           >
             {{ $t("infoPage.moreImage") }}
           </el-button>
-        </div>
-      </div>
-      <div class="toolItem" v-if="isChinaUnvi">
-        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
-        <div class="toolItemCount toolMapBox">
-          <baidu-map></baidu-map>
-        </div>
-      </div>
-      <div class="toolItem" v-if="!isChinaUnvi">
-        <div class="toolTitle">{{ $t("infoPage.mapTitle") }}</div>
-        <div class="toolItemCount toolMapBox">
-          <GoogleOrBingMap :center="map_center"></GoogleOrBingMap>
         </div>
       </div>
       <div class="toolItem" v-if="isChinaUnvi">
