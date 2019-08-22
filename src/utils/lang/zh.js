@@ -27,14 +27,25 @@ const zh = {
     infoTitle: "基本信息",
     imagesTitle: "校园图集",
     mapTitle: "地图信息",
+    subjectBoxTitle: "学科概况",
+    majorTitle: "学科评估结果",
     requireTitle: "申请要求",
     scoreTitle: "录取分数线",
+    costInfoTitle: "费用、奖学金和薪资",
     securityTitle: "校园安全",
+    alumniTitle: "知名校友",
+    newsTitle: "最新资讯",
+    mediaTitle: "社交媒体",
+    coursesTitle: "在线课程",
+    officialLink: "大学官网",
+    wikiLink: "维基百科",
+    baiduLink: "百度百科",
     moreImage: "查看更多",
     regionText: "地区排名",
     regionText2: "地区",
     globalText: "世界排名",
-    globalText2: "世界"
+    globalText2: "世界",
+    moreButton: "查看更多"
   },
   mobilePage: {
     regionLabel: "地区",
@@ -43,6 +54,19 @@ const zh = {
     globalText: "全球",
     moreLoadText: "加载中...",
     nomoreText: "暂无更多"
+  },
+  costInfo: {
+    label1: "费用",
+    label2: "奖学金",
+    label3: "薪资",
+    item1_label1: "学费",
+    item1_label2: "校内食宿费",
+    item2_label1: "奖学金数量",
+    item2_label2: "奖学金获得比例",
+    item2_label3: "奖学金总额",
+    item2_label4: "奖学金平均每笔金额",
+    item3_label1: "职业早期薪资",
+    item3_label2: "职业中期薪资"
   },
   ...zhLocale
 };

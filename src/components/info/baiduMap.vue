@@ -2,13 +2,16 @@
   <baidu-map
     class="toolMapCount baiduMapBox"
     @ready="map_handler"
+    :center="center"
     :zoom="map_zoom"
   >
+    <bm-marker :position="center"> </bm-marker>
     <bm-panorama anchor="BMAP_ANCHOR_BOTTOM_RIGHT"></bm-panorama>
   </baidu-map>
 </template>
 <script>
 export default {
+  props: ["center"],
   data() {
     return {
       map_zoom: 15
@@ -17,21 +20,8 @@ export default {
   created() {},
   methods: {
     map_handler({ BMap, map }) {
+      console.log(BMap);
       map.enableScrollWheelZoom(true);
-      let local = new BMap.LocalSearch(map, {
-        renderOptions: { map: map }
-      });
-      local.search(this.$route.query.cnName);
-      local.setPageCapacity(5);
-      local.disableFirstResultSelection();
-      local.setSearchCompleteCallback(res => {
-        if (res.Ar.length) {
-          let _point = res.Ar[0].point;
-          this.$nextTick(() => {
-            map.centerAndZoom(_point, 15);
-          });
-        }
-      });
     }
   }
 };
